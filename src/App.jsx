@@ -231,7 +231,7 @@ export default function App() {
                 const p = getPlayer(id), n = closeConf.warn.counts[id] || 0
                 const isLow = n === closeConf.warn.min && closeConf.warn.min !== closeConf.warn.max
                 return (
-                  <div key={id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                  <div key={id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 17 }}>
                     <span>{p?.name}</span>
                     <span style={{ fontWeight: 500, color: isLow ? 'var(--danger)' : 'var(--color-text-primary)' }}>{n} meciuri</span>
                   </div>
@@ -241,7 +241,7 @@ export default function App() {
           ) : (
             <div className="mu" style={{ marginBottom: 10 }}>Toți jucătorii au același număr de meciuri.</div>
           )}
-          <div className="mu" style={{ fontSize: 12 }}>Meciurile rămase vor fi anulate.</div>
+          <div className="mu" style={{ fontSize: 17 }}>Meciurile rămase vor fi anulate.</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setCloseConf(null)}>Anulează</button>
@@ -263,7 +263,7 @@ export default function App() {
         Ștergi jucătorul <span style={{ color: 'var(--danger)' }}>{getPlayer(delPlayerConf.id)?.name}</span>?
       </div>
       {delPlayerConf.warn
-        ? <div style={{ background: 'var(--dangerl)', color: 'var(--danger)', borderRadius: 8, padding: 10, fontSize: 13, textAlign: 'left', marginBottom: 8 }}>Participă în turnee existente. Se vor șterge și meciurile lui.</div>
+        ? <div style={{ background: 'var(--dangerl)', color: 'var(--danger)', borderRadius: 8, padding: 10, fontSize: 17, textAlign: 'left', marginBottom: 8 }}>Participă în turnee existente. Se vor șterge și meciurile lui.</div>
         : <div className="mu" style={{ marginBottom: 8 }}>Această acțiune nu poate fi anulată.</div>}
     </ConfirmModal>
   )
@@ -321,7 +321,7 @@ export default function App() {
     <div className="pg">
       <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
-        <span style={{ fontWeight: 500, fontSize: 15, flex: 1 }}>Admin</span>
+        <span style={{ fontWeight: 500, fontSize: 17, flex: 1 }}>Admin</span>
       </div>
 
       <div style={{ fontWeight: 500, marginBottom: 8 }}>Jucători ({players.length})</div>
@@ -339,7 +339,7 @@ export default function App() {
             return (
               <div key={p.id} className="row" style={{ padding: '6px 8px', borderRadius: 8, background: 'var(--color-background-secondary)' }}>
                 <div className="av">{p.name[0]}</div>
-                <span style={{ fontSize: 14, flex: 1 }}>{p.name}</span>
+                <span style={{ fontSize: 16, flex: 1 }}>{p.name}</span>
                 {inT && <Badge bg="var(--acl)" c="var(--act)">{tournaments.filter(t => t.pids.includes(p.id)).length} turnee</Badge>}
                 <button className="del" onClick={() => setDelPlayerConf({ id: p.id, warn: inT })}>✕</button>
               </div>
@@ -355,8 +355,8 @@ export default function App() {
           {[...tournaments].reverse().map(tr => (
             <div key={tr.id} className="row" style={{ padding: 8, borderRadius: 8, background: 'var(--color-background-secondary)' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, fontWeight: 500 }}>{tr.name}</div>
-                <div className="mu" style={{ fontSize: 12 }}>{tr.pids.length} jucători · {rounds.filter(r => r.tid === tr.id).length} runde</div>
+                <div style={{ fontSize: 16, fontWeight: 500 }}>{tr.name}</div>
+                <div className="mu" style={{ fontSize: 17 }}>{tr.pids.length} jucători · {rounds.filter(r => r.tid === tr.id).length} runde</div>
               </div>
               {tr.closed
                 ? <Badge bg="var(--color-background-tertiary)" c="var(--color-text-secondary)">încheiat</Badge>
@@ -369,7 +369,7 @@ export default function App() {
 
       <div className="card" style={{ background: 'var(--dangerl)', border: '1px solid var(--danger)', padding: 12 }}>
         <div style={{ textAlign: 'center', marginBottom: 10 }}>
-          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--danger)', marginBottom: 8 }}>⚠️ Zonă periculoasă</div>
+          <div style={{ fontSize: 17, fontWeight: 500, color: 'var(--danger)', marginBottom: 8 }}>⚠️ Zonă periculoasă</div>
         </div>
         <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={() => {
           if (confirm('Ești sigur? Toate turnee, meciuri și scoruri vor fi șterse!')) {
@@ -392,7 +392,7 @@ export default function App() {
       <div className="pg">
         <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
           <BackBtn onClick={() => setView('home')} />
-          <span style={{ fontWeight: 500, fontSize: 15 }}>Turneu nou</span>
+          <span style={{ fontWeight: 500, fontSize: 17 }}>Turneu nou</span>
         </div>
         <div className="card">
           <div className="mu" style={{ marginBottom: 5 }}>Numele turneului</div>
@@ -445,7 +445,7 @@ export default function App() {
     <div className="pg">
       <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
-        <span style={{ fontWeight: 500, fontSize: 15 }}>Statistici globale</span>
+        <span style={{ fontWeight: 500, fontSize: 17 }}>Statistici globale</span>
       </div>
       {globalStats.every(s => s.n === 0)
         ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
@@ -474,7 +474,7 @@ export default function App() {
         <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', background: 'var(--color-background-tertiary)', zIndex: 10, width: 560, paddingLeft: 16, paddingRight: 16, boxSizing: 'border-box', maxWidth: 'calc(100vw - 32px)' }}>
           <div className="row" style={{ marginBottom: 2, paddingTop: 8, justifyContent: 'space-between' }}>
             <BackBtn onClick={() => setView('home')} />
-            <span style={{ fontWeight: 500, fontSize: 13, textAlign: 'center', flex: 1 }}>{t.name}</span>
+            <span style={{ fontWeight: 500, fontSize: 17, textAlign: 'center', flex: 1 }}>{t.name}</span>
             {!isClosed && (
               <button className="btn sm" style={{ color: 'var(--danger)', borderColor: 'var(--danger)', flexShrink: 0 }} onClick={tryClose}>
                 🏁 Închide
@@ -492,8 +492,8 @@ export default function App() {
           </div>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 8, borderBottom: '0.5px solid var(--color-border-tertiary)' }}>
-            <span style={{ fontWeight: 500, fontSize: 13 }}>Runda {currentRound?.num}</span>
-            <span className="mu" style={{ fontSize: 12 }}>{currentRoundPlayed}/{currentRoundMatches.length} meciuri</span>
+            <span style={{ fontWeight: 500, fontSize: 17 }}>Runda {currentRound?.num}</span>
+            <span className="mu" style={{ fontSize: 17 }}>{currentRoundPlayed}/{currentRoundMatches.length} meciuri</span>
           </div>
         </div>
 
@@ -516,10 +516,10 @@ export default function App() {
                 <div key={r.id}>
                   {r.id !== currentRound?.id && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontWeight: 500, fontSize: 14 }}>Runda {r.num}</span>
+                      <span style={{ fontWeight: 500, fontSize: 16 }}>Runda {r.num}</span>
                       {done
                         ? <Badge bg="var(--acl)" c="var(--act)">✓ completă</Badge>
-                        : <span className="mu" style={{ fontSize: 12 }}>{rp}/{rms.length} meciuri</span>}
+                        : <span className="mu" style={{ fontSize: 17 }}>{rp}/{rms.length} meciuri</span>}
                     </div>
                   )}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
