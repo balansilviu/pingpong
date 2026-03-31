@@ -561,7 +561,7 @@ export default function App() {
     <div className="pg">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4, marginBottom: 16 }}>
         <div>
-          <div style={{ fontSize: 19, fontWeight: 500 }}>🏓 Ping pong v2</div>
+          <div style={{ fontSize: 19, fontWeight: 500, cursor: 'pointer' }} onClick={() => { setView('home'); setTid(null) }}>🏓 Ping pong</div>
           <div className="mu">Clasamentul grupului</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>

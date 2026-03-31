@@ -39,12 +39,12 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
+  padding: 9px 16px;
   border-radius: var(--border-radius-md);
   border: 0.5px solid var(--color-border-secondary);
   background: var(--color-background-primary);
   color: var(--color-text-primary);
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
@@ -54,25 +54,25 @@ body {
 .btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
 .btn.ac { background: var(--ac); border-color: var(--ac); color: #fff; }
 .btn.ac:hover { opacity: 0.9; }
-.btn.sm { padding: 5px 11px; font-size: 12px; }
+.btn.sm { padding: 7px 13px; font-size: 14px; }
 
 /* Inputs */
 .inp {
   display: block;
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border: 0.5px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);
   background: var(--color-background-secondary);
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
   outline: none;
 }
 .inp:focus { border-color: var(--ac); }
 
 .sinp {
-  width: 50px;
+  width: 65px;
   padding: 3px 2px;
   border: 0.5px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);
@@ -123,8 +123,8 @@ body {
 
 /* Misc */
 .row { display: flex; align-items: center; gap: 10px; }
-.mu { color: var(--color-text-secondary); font-size: 13px; }
-.er { font-size: 13px; color: var(--danger); }
+.mu { color: var(--color-text-secondary); font-size: 14px; }
+.er { font-size: 14px; color: var(--danger); }
 .hov { cursor: pointer; transition: background 0.12s; }
 .hov:hover { background: var(--color-background-secondary); }
 .del {
@@ -144,10 +144,10 @@ body {
 .warn { background: var(--wbg); color: var(--wc); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; }
 
 /* Table */
-.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
-.tbl th { text-align: center; font-weight: 500; font-size: 11px; color: var(--color-text-secondary); padding: 0 6px 8px; white-space: nowrap; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 16px; }
+.tbl th { text-align: center; font-weight: 500; font-size: 13px; color: var(--color-text-secondary); padding: 0 6px 10px; white-space: nowrap; }
 .tbl th:first-child { text-align: left; padding-left: 0; }
-.tbl td { text-align: center; padding: 8px 6px; border-top: 0.5px solid var(--color-border-tertiary); }
+.tbl td { text-align: center; padding: 10px 6px; border-top: 0.5px solid var(--color-border-tertiary); }
 .tbl td:first-child { text-align: left; padding-left: 0; }
 .tbl tr:first-child td { border-top: none; }
 
