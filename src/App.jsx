@@ -285,12 +285,12 @@ export default function App() {
 
   // ---- Admin login ----
   if (view === 'al') return (
-    <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
-      <div className="card" style={{ width: '100%', maxWidth: 300 }}>
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <div style={{ fontSize: 28, marginBottom: 6 }}>🔐</div>
-          <div style={{ fontWeight: 500 }}>Admin</div>
-          <div className="mu" style={{ marginTop: 4 }}>Introdu PIN-ul de admin</div>
+    <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 80 }}>
+      <div className="card" style={{ width: '100%', maxWidth: 320 }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ fontSize: 48, marginBottom: 10 }}>🔐</div>
+          <div style={{ fontWeight: 700, fontSize: 22 }}>Admin</div>
+          <div className="mu" style={{ marginTop: 6, fontSize: 16 }}>Introdu PIN-ul de admin</div>
         </div>
         <input
           className="inp"
@@ -298,17 +298,17 @@ export default function App() {
           value={pin}
           onInput={e => { setPin(e.target.value); setPinErr(false) }}
           onKeyDown={e => { if (e.key === 'Enter') { if (pin === PIN) { setPin(''); go('a') } else setPinErr(true) } }}
-          style={{ textAlign: 'center', letterSpacing: 8, fontSize: 22, marginBottom: 8 }}
+          style={{ textAlign: 'center', letterSpacing: 10, fontSize: 28, marginBottom: 10 }}
           placeholder="••••"
           onFocus={e => e.target.placeholder = ''}
           onBlur={e => e.target.placeholder = '••••'}
         />
-        {pinErr && <div className="er" style={{ textAlign: 'center', marginBottom: 8 }}>PIN incorect</div>}
-        <button className="btn ac" style={{ width: '100%', justifyContent: 'center' }}
+        {pinErr && <div className="er" style={{ textAlign: 'center', marginBottom: 10, fontSize: 16 }}>PIN incorect</div>}
+        <button className="btn ac" style={{ width: '100%', justifyContent: 'center', fontSize: 18 }}
           onClick={() => { if (pin === PIN) { setPin(''); go('a') } else setPinErr(true) }}>
           Intră
         </button>
-        <button className="btn" style={{ width: '100%', justifyContent: 'center', marginTop: 8, border: 'none' }}
+        <button className="btn" style={{ width: '100%', justifyContent: 'center', marginTop: 10, border: 'none', boxShadow: 'none' }}
           onClick={() => setView('home')}>
           Anulează
         </button>
@@ -319,28 +319,30 @@ export default function App() {
   // ---- Admin panel ----
   if (view === 'a') return (
     <div className="pg">
-      <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
+      <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
-        <span style={{ fontWeight: 500, fontSize: 22, flex: 1 }}>Admin</span>
+        <span style={{ fontWeight: 700, fontSize: 24, flex: 1 }}>Admin</span>
       </div>
 
-      <div style={{ fontWeight: 500, marginBottom: 8 }}>Jucători ({players.length})</div>
-      <div className="card" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <div className="sec-hd">
+        <span className="sec-hd-title">Jucători ({players.length})</span>
+      </div>
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
           <input className="inp" placeholder="Nume jucător nou..." value={newPlayer}
             onInput={e => setNewPlayer(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addPlayer()} />
           <button className="btn ac sm" onClick={addPlayer} style={{ flexShrink: 0 }}>Adaugă</button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {players.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 12 }}>Niciun jucător adăugat</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {players.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 16 }}>Niciun jucător adăugat</div>}
           {players.map(p => {
             const inT = tournaments.some(t => t.pids.includes(p.id))
             return (
-              <div key={p.id} className="row" style={{ padding: '6px 8px', borderRadius: 8, background: 'var(--color-background-secondary)' }}>
+              <div key={p.id} className="row" style={{ padding: '10px 12px', borderRadius: 14, background: 'var(--muted)' }}>
                 <div className="av">{p.name[0]}</div>
-                <span style={{ fontSize: 21, flex: 1 }}>{p.name}</span>
-                {inT && <Badge bg="var(--acl)" c="var(--act)">{tournaments.filter(t => t.pids.includes(p.id)).length} turnee</Badge>}
+                <span style={{ fontSize: 18, fontWeight: 500, flex: 1 }}>{p.name}</span>
+                {inT && <Badge bg="var(--greenl)" c="var(--greend)">{tournaments.filter(t => t.pids.includes(p.id)).length} turnee</Badge>}
                 <button className="del" onClick={() => setDelPlayerConf({ id: p.id, warn: inT })}>✕</button>
               </div>
             )
@@ -348,30 +350,30 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ fontWeight: 500, marginBottom: 8 }}>Turnee ({tournaments.length})</div>
-      <div className="card" style={{ marginBottom: 16 }}>
-        {tournaments.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 12 }}>Niciun turneu creat</div>}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="sec-hd">
+        <span className="sec-hd-title">Turnee ({tournaments.length})</span>
+      </div>
+      <div className="card" style={{ marginBottom: 20 }}>
+        {tournaments.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 16 }}>Niciun turneu creat</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[...tournaments].reverse().map(tr => (
-            <div key={tr.id} className="row" style={{ padding: 8, borderRadius: 8, background: 'var(--color-background-secondary)' }}>
+            <div key={tr.id} className="row" style={{ padding: '10px 12px', borderRadius: 14, background: 'var(--muted)' }}>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 21, fontWeight: 500 }}>{tr.name}</div>
-                <div className="mu" style={{ fontSize: 22 }}>{tr.pids.length} jucători · {rounds.filter(r => r.tid === tr.id).length} runde</div>
+                <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 2 }}>{tr.name}</div>
+                <div className="mu">{tr.pids.length} jucători · {rounds.filter(r => r.tid === tr.id).length} runde</div>
               </div>
               {tr.closed
-                ? <Badge bg="var(--color-background-tertiary)" c="var(--color-text-secondary)">încheiat</Badge>
-                : <Badge bg="var(--acl)" c="var(--act)">activ</Badge>}
+                ? <Badge bg="var(--bg)" c="var(--text2)">încheiat</Badge>
+                : <Badge bg="var(--greenl)" c="var(--greend)">activ</Badge>}
               <button className="del" onClick={() => setDelTourneyConf(tr.id)}>✕</button>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="card" style={{ background: 'var(--dangerl)', border: '1px solid var(--danger)', padding: 12 }}>
-        <div style={{ textAlign: 'center', marginBottom: 10 }}>
-          <div style={{ fontSize: 22, fontWeight: 500, color: 'var(--danger)', marginBottom: 8 }}>⚠️ Zonă periculoasă</div>
-        </div>
-        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={() => {
+      <div className="card" style={{ background: 'var(--redl)', border: '1.5px solid var(--red)' }}>
+        <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--red)', marginBottom: 12 }}>⚠️ Zonă periculoasă</div>
+        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }} onClick={() => {
           if (confirm('Ești sigur? Toate turnee, meciuri și scoruri vor fi șterse!')) {
             clearAllData()
             setPlayers(INIT_PLAYERS)
@@ -390,9 +392,9 @@ export default function App() {
     const nM = selectedPlayers.length * (selectedPlayers.length - 1) / 2
     return (
       <div className="pg">
-        <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
+        <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
           <BackBtn onClick={() => setView('home')} />
-          <span style={{ fontWeight: 500, fontSize: 22 }}>Turneu nou</span>
+          <span style={{ fontWeight: 700, fontSize: 24 }}>Turneu nou</span>
         </div>
         <div className="card">
           <div className="mu" style={{ marginBottom: 5 }}>Numele turneului</div>
@@ -443,9 +445,9 @@ export default function App() {
   // ---- Global stats ----
   if (view === 'g') return (
     <div className="pg">
-      <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
+      <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
-        <span style={{ fontWeight: 500, fontSize: 22 }}>Statistici globale</span>
+        <span style={{ fontWeight: 700, fontSize: 24 }}>Statistici globale</span>
       </div>
       {globalStats.every(s => s.n === 0)
         ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
@@ -470,29 +472,46 @@ export default function App() {
     }
 
     return (
-      <div className="pg" style={{ paddingTop: 160 }}>
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--bg2)', zIndex: 10 }}>
-          <div style={{ maxWidth: 480, margin: '0 auto', padding: '10px 16px 0' }}>
-            <div className="row" style={{ marginBottom: 6, justifyContent: 'space-between' }}>
-              <BackBtn onClick={() => setView('home')} />
-              <span style={{ fontWeight: 600, fontSize: 17, textAlign: 'center', flex: 1 }}>{t.name}</span>
+      <div className="pg" style={{ paddingTop: 170 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--greend)', zIndex: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '12px 16px 0' }}>
+            <div className="row" style={{ marginBottom: 10, justifyContent: 'space-between' }}>
+              <BackBtn onClick={() => setView('home')} color="#fff" />
+              <span style={{ fontWeight: 700, fontSize: 18, textAlign: 'center', flex: 1, color: '#fff' }}>{t.name}</span>
               {!isClosed && (
-                <button className="btn sm" style={{ color: 'var(--danger)', borderColor: 'var(--danger)', flexShrink: 0 }} onClick={tryClose}>
+                <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff', flexShrink: 0 }} onClick={tryClose}>
                   🏁 Închide
                 </button>
               )}
             </div>
-            <div className="prog" style={{ marginBottom: 10 }}>
-              <div className="pf" style={{ width: `${currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%` }} />
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
               {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
-                <button key={k} className={`tab${tab === k ? ' on' : ''}`} disabled={k === 's' && !isClosed} style={k === 's' && !isClosed ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={() => !isClosed && k === 's' ? null : setTab(k)}>{lb}</button>
+                <button key={k}
+                  onClick={() => !isClosed && k === 's' ? null : setTab(k)}
+                  disabled={k === 's' && !isClosed}
+                  style={{
+                    flex: 1, minHeight: 40, padding: '8px 12px',
+                    borderRadius: 999, border: 'none',
+                    background: tab === k ? '#fff' : 'rgba(255,255,255,0.18)',
+                    color: tab === k ? 'var(--greend)' : (k === 's' && !isClosed ? 'rgba(255,255,255,0.4)' : '#fff'),
+                    fontSize: 15, fontWeight: 600, cursor: k === 's' && !isClosed ? 'not-allowed' : 'pointer',
+                    fontFamily: 'inherit',
+                  }}
+                >{lb}</button>
               ))}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--border1)' }}>
-              <span style={{ fontWeight: 600, fontSize: 17 }}>Runda {currentRound?.num}</span>
-              <span className="mu">{currentRoundPlayed}/{currentRoundMatches.length} meciuri</span>
+            <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 10, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Runda curentă</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Runda {currentRound?.num}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Meciuri</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{currentRoundPlayed}/{currentRoundMatches.length}</div>
+              </div>
+              <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -515,11 +534,11 @@ export default function App() {
               return (
                 <div key={r.id}>
                   {r.id !== currentRound?.id && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontWeight: 600, fontSize: 17 }}>Runda {r.num}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                      <span style={{ fontWeight: 700, fontSize: 18 }}>Runda {r.num}</span>
                       {done
                         ? <Badge bg="var(--acl)" c="var(--act)">✓ completă</Badge>
-                        : <span className="mu" style={{ fontSize: 22 }}>{rp}/{rms.length} meciuri</span>}
+                        : <span className="mu">{rp}/{rms.length} meciuri</span>}
                     </div>
                   )}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -559,51 +578,57 @@ export default function App() {
   // ---- Home ----
   return (
     <div className="pg">
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4, marginBottom: 16 }}>
-        <div>
-          <div style={{ fontSize: 22, fontWeight: 700, cursor: 'pointer' }} onClick={() => { setView('home'); setTid(null) }}>🏓 Ping pong</div>
-          <div className="mu">Clasamentul grupului</div>
-        </div>
-        <div style={{ display: 'flex', gap: 6 }}>
-          <button className="btn sm" onClick={() => setView('g')}>📈 Stats</button>
-          <button className="btn sm" onClick={() => { setView('al'); setPin(''); setPinErr(false) }}>🔐 Admin</button>
+      {/* Hero */}
+      <div className="home-hero">
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          <div>
+            <div className="home-hero-title" onClick={() => { setView('home'); setTid(null) }}>🏓 Ping Pong</div>
+            <div className="home-hero-sub">Clasamentul grupului</div>
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+            <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff' }} onClick={() => setView('g')}>📈</button>
+            <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff' }} onClick={() => { setView('al'); setPin(''); setPinErr(false) }}>🔐</button>
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <span style={{ fontWeight: 500 }}>Turnee</span>
-        <button className="btn ac sm" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ turneu nou</button>
+      <div className="sec-hd">
+        <span className="sec-hd-title">Turnee</span>
+        <button className="btn ac sm" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ Turneu nou</button>
       </div>
 
       {tournaments.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '48px 20px' }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>🏆</div>
-          <div className="mu" style={{ marginBottom: 16 }}>Niciun turneu creat încă</div>
-          <button className="btn ac" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>Creează primul turneu</button>
+        <div className="card" style={{ textAlign: 'center', padding: '52px 20px' }}>
+          <div style={{ fontSize: 48, marginBottom: 14 }}>🏆</div>
+          <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 6 }}>Niciun turneu creat</div>
+          <div className="mu" style={{ marginBottom: 20 }}>Apasă butonul de mai jos pentru a începe</div>
+          <button className="btn ac lg" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed', width: '100%' } : { width: '100%' }} onClick={openCreate}>Creează primul turneu</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[...tournaments].reverse().map(tr => {
             const tms = matches.filter(m => m.tid === tr.id)
             const ap = tms.filter(m => m.st === 'a').length
             const tot = tms.filter(m => m.st !== 'x').length
             const nr = rounds.filter(r => r.tid === tr.id).length
+            const pct = tot ? Math.round(ap / tot * 100) : 0
             return (
-              <div key={tr.id} className="card hov" onClick={() => go('t', { tid: tr.id, tab: 'r' })}>
+              <div key={tr.id} className={`t-card ${tr.closed ? 'closed' : 'active'}`} onClick={() => go('t', { tid: tr.id, tab: 'r' })}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <div className="row" style={{ gap: 8 }}>
-                    <span style={{ fontWeight: 500 }}>{tr.name}</span>
-                    {tr.closed
-                      ? <Badge bg="var(--color-background-secondary)" c="var(--color-text-secondary)">🏁 încheiat</Badge>
-                      : <Badge bg="var(--acl)" c="var(--act)">activ</Badge>}
-                  </div>
+                  <div className="t-card-name">{tr.name}</div>
+                  {tr.closed
+                    ? <Badge bg="var(--muted)" c="var(--text2)">🏁 încheiat</Badge>
+                    : <Badge bg="var(--greenl)" c="var(--greend)">● activ</Badge>}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span className="mu">{tr.pids.length} jucători · {nr} runde · {ap}/{tot} meciuri</span>
-                  <div className="prog" style={{ flex: 1, maxWidth: 70 }}>
-                    <div className="pf" style={{ width: `${tot ? Math.round(ap / tot * 100) : 0}%` }} />
+                <div className="t-card-meta">{tr.pids.length} jucători · {nr} runde · {ap}/{tot} meciuri</div>
+                {!tr.closed && tot > 0 && (
+                  <div style={{ marginTop: 10 }}>
+                    <div className="prog">
+                      <div className="pf" style={{ width: `${pct}%` }} />
+                    </div>
+                    <div style={{ fontSize: 13, color: 'var(--text2)', marginTop: 4, textAlign: 'right' }}>{pct}%</div>
                   </div>
-                </div>
+                )}
               </div>
             )
           })}

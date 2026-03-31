@@ -24,11 +24,11 @@ export function Badge({ bg, c, children }) {
   )
 }
 
-export function BackBtn({ onClick }) {
+export function BackBtn({ onClick, color }) {
   return (
     <button
       className="btn sm"
-      style={{ border: 'none', background: 'transparent', minWidth: 48, justifyContent: 'center', fontSize: 22 }}
+      style={{ border: 'none', background: 'transparent', minWidth: 48, justifyContent: 'center', fontSize: 22, color: color || 'inherit', boxShadow: 'none' }}
       onClick={onClick}
     >
       ←
@@ -44,7 +44,7 @@ export function Medal({ rank }) {
 
 export function StandingsTable({ rows }) {
   return (
-    <div className="card" style={{ padding: '16px' }}>
+    <div className="card" style={{ padding: '20px 16px' }}>
       <table className="tbl">
         <thead>
           <tr>
@@ -61,21 +61,21 @@ export function StandingsTable({ rows }) {
             return (
               <tr key={s.id}>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Medal rank={i + 1} />
-                    <span style={{ fontWeight: i === 0 ? 600 : 400 }}>{s.name}</span>
+                    <span style={{ fontWeight: i === 0 ? 700 : 500, fontSize: 17 }}>{s.name}</span>
                   </div>
                 </td>
-                <td style={{ fontWeight: 600, color: 'var(--ac)' }}>{pct}</td>
-                <td style={{ color: 'var(--ac)' }}>{s.w}</td>
-                <td style={{ color: 'var(--danger)' }}>{s.l}</td>
-                <td>{s.pf}</td>
+                <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 17 }}>{pct}</td>
+                <td style={{ color: 'var(--ac)', fontSize: 17 }}>{s.w}</td>
+                <td style={{ color: 'var(--danger)', fontSize: 17 }}>{s.l}</td>
+                <td style={{ fontSize: 17 }}>{s.pf}</td>
               </tr>
             )
           })}
         </tbody>
       </table>
-      <div style={{ marginTop: 12, fontSize: 13, color: 'var(--text2)' }}>
+      <div style={{ marginTop: 14, fontSize: 14, color: 'var(--text2)' }}>
         Departajare la egalitate: total puncte marcate
       </div>
     </div>

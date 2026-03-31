@@ -30,44 +30,54 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
   }
 
   return (
-    <div
-      className="card"
-      style={{
-        padding: '10px 14px',
-        borderColor: isA ? 'var(--acb)' : open ? 'var(--ac)' : undefined,
-        borderWidth: isA || open ? '1.5px' : undefined,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minHeight: 48 }}>
-        <span style={{ flex: 1, textAlign: 'right', fontWeight: w1 ? 600 : 400, color: w1 ? 'var(--ac)' : 'var(--text1)', fontSize: 18 }}>
+    <div className={`m-card${isA ? ' done' : ''}`} style={open ? { border: '2px solid var(--green)' } : {}}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minHeight: 52 }}>
+        <span style={{
+          flex: 1, textAlign: 'right',
+          fontWeight: w1 ? 700 : 500,
+          color: w1 ? 'var(--green)' : 'var(--text)',
+          fontSize: 19,
+        }}>
           {p1?.name}
         </span>
-        <div style={{ minWidth: 90, textAlign: 'center', flexShrink: 0 }}>
+
+        <div style={{ minWidth: 100, textAlign: 'center', flexShrink: 0 }}>
           {isA
-            ? <span style={{ fontSize: 19, fontWeight: 700, letterSpacing: 1 }}>{m.score[0]} – {m.score[1]}</span>
+            ? <span style={{
+                fontSize: 22, fontWeight: 800, letterSpacing: 2,
+                color: 'var(--text)',
+              }}>{m.score[0]} – {m.score[1]}</span>
             : isClosed
               ? <span style={{ fontSize: 14, color: 'var(--text2)' }}>nejucat</span>
               : <button
                   className="btn ac sm"
                   onClick={toggle}
-                  style={open ? { background: 'var(--bg1)', color: 'var(--text1)', borderColor: 'var(--border2)' } : {}}
+                  style={open
+                    ? { background: 'var(--muted)', color: 'var(--text)', borderColor: 'rgba(0,0,0,0.12)' }
+                    : {}}
                 >
                   {open ? '✕' : '+ scor'}
                 </button>
           }
         </div>
-        <span style={{ flex: 1, fontWeight: w2 ? 600 : 400, color: w2 ? 'var(--ac)' : 'var(--text1)', fontSize: 18 }}>
+
+        <span style={{
+          flex: 1,
+          fontWeight: w2 ? 700 : 500,
+          color: w2 ? 'var(--green)' : 'var(--text)',
+          fontSize: 19,
+        }}>
           {p2?.name}
         </span>
       </div>
 
       {open && (
-        <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, justifyContent: 'center' }}>
             <ScoreInput value={s1} onChange={v => { setS1(v); setErr('') }} onEnter={save} label={p1?.name} />
-            <span style={{ color: 'var(--text2)', fontSize: 20, paddingTop: 20 }}>–</span>
+            <span style={{ color: 'var(--text2)', fontSize: 24, paddingBottom: 22 }}>–</span>
             <ScoreInput value={s2} onChange={v => { setS2(v); setErr('') }} onEnter={save} label={p2?.name} />
-            <button className="btn ac sm" style={{ marginTop: 20, flexShrink: 0 }} onClick={save}>Salvează</button>
+            <button className="btn ac sm" style={{ marginBottom: 4, flexShrink: 0 }} onClick={save}>Salvează</button>
           </div>
           {err && <div className="er" style={{ textAlign: 'center', marginTop: 8 }}>{err}</div>}
         </div>
