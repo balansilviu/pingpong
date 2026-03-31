@@ -14,7 +14,7 @@ export const INIT_PLAYERS = [
 export function Badge({ bg, c, children }) {
   return (
     <span style={{
-      fontSize: 13, background: bg, color: c,
+      fontSize: 17, background: bg, color: c,
       padding: '2px 8px', borderRadius: 9999,
       display: 'inline-flex', alignItems: 'center'
     }}>
@@ -33,8 +33,8 @@ export function BackBtn({ onClick }) {
 
 export function Medal({ rank }) {
   const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  if (medals[rank]) return <span style={{ fontSize: 18, lineHeight: 1 }}>{medals[rank]}</span>
-  return <span style={{ fontSize: 14, color: 'var(--color-text-secondary)', minWidth: 20, textAlign: 'center' }}>{rank}</span>
+  if (medals[rank]) return <span style={{ fontSize: 22, lineHeight: 1 }}>{medals[rank]}</span>
+  return <span style={{ fontSize: 22, color: 'var(--color-text-secondary)', minWidth: 20, textAlign: 'center' }}>{rank}</span>
 }
 
 export function StandingsTable({ rows }) {
@@ -70,7 +70,7 @@ export function StandingsTable({ rows }) {
           })}
         </tbody>
       </table>
-      <div style={{ marginTop: 10, fontSize: 13, color: 'var(--color-text-secondary)' }}>
+      <div style={{ marginTop: 10, fontSize: 17, color: 'var(--color-text-secondary)' }}>
         Departajare la egalitate: total puncte marcate
       </div>
     </div>
@@ -80,7 +80,7 @@ export function StandingsTable({ rows }) {
 export function ScoreInput({ value, onChange, onEnter, label }) {
   return (
     <div style={{ textAlign: 'center' }}>
-      <div className="mu" style={{ fontSize: 13, marginBottom: 1 }}>{label}</div>
+      <div className="mu" style={{ fontSize: 17, marginBottom: 1 }}>{label}</div>
       <input
         className="sinp"
         type="number" min="0" max="30"
