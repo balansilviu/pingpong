@@ -1,13 +1,16 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PIN, INIT_PLAYERS, Badge, BackBtn, StandingsTable, ConfirmModal } from './components.jsx'
 import MatchCard from './MatchCard.jsx'
 import { gid, autoName, mkRound, sortStandings, calcStandings, unequalWarn } from './utils.js'
+import { loadPlayers, loadTournaments, loadRounds, loadMatches, savePlayers, saveAll, clearAllData } from './supabase.js'
 
 export default function App() {
   const [players, setPlayers] = useState(INIT_PLAYERS)
   const [tournaments, setTournaments] = useState([])
   const [rounds, setRounds] = useState([])
   const [matches, setMatches] = useState([])
+
+  const loaded = useRef(false)
 
   const [view, setView] = useState('home') // home | c | t | g | a | al
   const [tid, setTid] = useState(null)
@@ -17,11 +20,13 @@ export default function App() {
   const [pinErr, setPinErr] = useState(false)
   const [tourneyName, setTourneyName] = useState('')
   const [selectedPlayers, setSelectedPlayers] = useState([])
+  const [numTables, setNumTables] = useState(1)
   const [newPlayer, setNewPlayer] = useState('')
 
   const [delPlayerConf, setDelPlayerConf] = useState(null)
   const [delTourneyConf, setDelTourneyConf] = useState(null)
   const [closeConf, setCloseConf] = useState(null)
+  const [switchTourneyConf, setSwitchTourneyConf] = useState(null)
 
   const t = tournaments.find(x => x.id === tid)
   const tRounds = rounds.filter(r => r.tid === tid).sort((a, b) => a.num - b.num)
@@ -29,26 +34,77 @@ export default function App() {
   const getPlayer = id => players.find(p => p.id === id)
 
   function go(v, opts = {}) {
+    // Previne deschiderea unui alt turneu daca este deja un turneu deschis
+    if (v === 't' && opts.tid && tid && tid !== opts.tid) {
+      setSwitchTourneyConf({ newTid: opts.tid, newTab: opts.tab })
+      return
+    }
     setView(v)
     if (opts.tid != null) setTid(opts.tid)
     if (opts.tab != null) setTab(opts.tab)
   }
 
+  // Load data from Supabase on mount
+  useEffect(() => {
+    async function loadData() {
+      console.log('loadData: Starting...')
+      const [p, t, r, m] = await Promise.all([
+        loadPlayers(),
+        loadTournaments(),
+        loadRounds(),
+        loadMatches()
+      ])
+      console.log('loadData results:', { players: p.length, tournaments: t.length, rounds: r.length, matches: m.length })
+      console.log('loadData tournaments data:', t)
+      console.log('loadData rounds data:', r)
+      console.log('loadData matches data:', m)
+      if (p.length > 0) setPlayers(p)
+      if (t.length > 0) setTournaments(t)
+      if (r.length > 0) setRounds(r)
+      if (m.length > 0) setMatches(m)
+      await new Promise(resolve => setTimeout(resolve, 0))
+      console.log('[LOAD] Setting loaded=true')
+      loaded.current = true
+    }
+    loadData()
+  }, [])
+
+  // Auto-save to Supabase (only after initial load)
+  useEffect(() => {
+    console.log('[SAVE EFFECT] players fired, loaded=', loaded.current, 'count=', players.length)
+    if (!loaded.current) { console.log('[SAVE EFFECT] players SKIPPED (not loaded yet)'); return }
+    savePlayers(players)
+  }, [players])
+
+  // Salvează tournaments → rounds → matches în ordine (FK constraints)
+  useEffect(() => {
+    console.log('[SAVE EFFECT] t/r/m fired, loaded=', loaded.current, 't=', tournaments.length, 'r=', rounds.length, 'm=', matches.length)
+    if (!loaded.current) { console.log('[SAVE EFFECT] t/r/m SKIPPED'); return }
+    saveAll(tournaments, rounds, matches)
+  }, [tournaments, rounds, matches])
+
   // ---- Tournament creation ----
   function openCreate() {
+    if (tid) {
+      // Un turneu este deschis, nu permite crearea unuia nou
+      alert('Un turneu este deja deschis. Te rog să te întorci la el sau să-l închiezi înainte de a crea altul.')
+      return
+    }
     setTourneyName(autoName(tournaments))
     setSelectedPlayers([])
+    setNumTables(1)
     setView('c')
   }
 
   function createTourney() {
-    if (!tourneyName.trim() || selectedPlayers.length < 2) return
+    if (!tourneyName.trim() || selectedPlayers.length < 2 || numTables < 1) return
     const tid2 = gid()
-    const { round, ms } = mkRound(selectedPlayers, tid2, 1)
+    const { round, ms } = mkRound(selectedPlayers, tid2, 1, numTables)
     setTournaments(p => [...p, {
       id: tid2,
       name: tourneyName.trim(),
       pids: [...selectedPlayers],
+      tables: numTables,
       date: new Date().toLocaleDateString('ro-RO'),
       closed: false
     }])
@@ -59,7 +115,7 @@ export default function App() {
 
   function addRound() {
     if (!t || t.closed) return
-    const { round, ms } = mkRound(t.pids, tid, tRounds.length + 1)
+    const { round, ms } = mkRound(t.pids, tid, tRounds.length + 1, t.tables)
     setRounds(p => [...p, round])
     setMatches(p => [...p, ...ms])
   }
@@ -133,6 +189,33 @@ export default function App() {
   const lastRoundDone = lastRoundMs.length > 0 && lastRoundMs.every(m => m.st === 'a' || m.st === 'x')
 
   // ---- Modals ----
+  if (switchTourneyConf) return (
+    <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
+      <div className="card" style={{ width: '100%', maxWidth: 340 }}>
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontWeight: 500, marginBottom: 10 }}>
+            Un turneu este deja deschis.
+          </div>
+          <div className="mu" style={{ marginBottom: 10 }}>Trebuie să te întorci la ecranul principal pentru a deschide alt turneu.</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setSwitchTourneyConf(null)}>Anulează</button>
+          <button className="btn ac" style={{ flex: 1, justifyContent: 'center' }} onClick={() => {
+            setSwitchTourneyConf(null)
+            setView('home')
+            setTid(null)
+            setTimeout(() => {
+              setView('t')
+              setTid(switchTourneyConf.newTid)
+              if (switchTourneyConf.newTab) setTab(switchTourneyConf.newTab)
+            }, 0)
+          }}>OK</button>
+        </div>
+      </div>
+    </div>
+  )
+
   if (closeConf) return (
     <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
       <div className="card" style={{ width: '100%', maxWidth: 340 }}>
@@ -217,6 +300,8 @@ export default function App() {
           onKeyDown={e => { if (e.key === 'Enter') { if (pin === PIN) { setPin(''); go('a') } else setPinErr(true) } }}
           style={{ textAlign: 'center', letterSpacing: 8, fontSize: 22, marginBottom: 8 }}
           placeholder="••••"
+          onFocus={e => e.target.placeholder = ''}
+          onBlur={e => e.target.placeholder = '••••'}
         />
         {pinErr && <div className="er" style={{ textAlign: 'center', marginBottom: 8 }}>PIN incorect</div>}
         <button className="btn ac" style={{ width: '100%', justifyContent: 'center' }}
@@ -237,7 +322,6 @@ export default function App() {
       <div className="row" style={{ marginBottom: 16, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
         <span style={{ fontWeight: 500, fontSize: 15, flex: 1 }}>Admin</span>
-        <Badge bg="var(--acl)" c="var(--act)">PIN: {PIN}</Badge>
       </div>
 
       <div style={{ fontWeight: 500, marginBottom: 8 }}>Jucători ({players.length})</div>
@@ -265,7 +349,7 @@ export default function App() {
       </div>
 
       <div style={{ fontWeight: 500, marginBottom: 8 }}>Turnee ({tournaments.length})</div>
-      <div className="card">
+      <div className="card" style={{ marginBottom: 16 }}>
         {tournaments.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 12 }}>Niciun turneu creat</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {[...tournaments].reverse().map(tr => (
@@ -282,6 +366,22 @@ export default function App() {
           ))}
         </div>
       </div>
+
+      <div className="card" style={{ background: 'var(--dangerl)', border: '1px solid var(--danger)', padding: 12 }}>
+        <div style={{ textAlign: 'center', marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--danger)', marginBottom: 8 }}>⚠️ Zonă periculoasă</div>
+        </div>
+        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={() => {
+          if (confirm('Ești sigur? Toate turnee, meciuri și scoruri vor fi șterse!')) {
+            clearAllData()
+            setPlayers(INIT_PLAYERS)
+            setTournaments([])
+            setRounds([])
+            setMatches([])
+            setView('home')
+          }
+        }}>🗑️ Șterge TOTUL</button>
+      </div>
     </div>
   )
 
@@ -297,6 +397,14 @@ export default function App() {
         <div className="card">
           <div className="mu" style={{ marginBottom: 5 }}>Numele turneului</div>
           <input className="inp" value={tourneyName} onInput={e => setTourneyName(e.target.value)} style={{ marginBottom: 16 }} />
+          
+          <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
+            <div style={{ flex: 1 }}>
+              <div className="mu" style={{ marginBottom: 5 }}>Numărul de mese</div>
+              <input className="inp" type="number" min="1" value={numTables} onInput={e => setNumTables(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '100%' }} />
+            </div>
+          </div>
+          
           <div className="mu" style={{ marginBottom: 8 }}>Selectează jucătorii ({selectedPlayers.length} selectați)</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 16 }}>
             {players.map(p => {
@@ -356,6 +464,11 @@ export default function App() {
     const currentRoundMatches = currentRound ? matches.filter(m => m.rid === currentRound.id && m.st !== 'x') : []
     const currentRoundPlayed = currentRoundMatches.filter(m => m.st === 'a').length
 
+    // Forțează tab-ul la Meciuri dacă turneul nu e încheiat
+    if (!isClosed && tab === 's') {
+      setTab('r')
+    }
+
     return (
       <div className="pg" style={{ paddingTop: 140 }}>
         <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', background: 'var(--color-background-tertiary)', zIndex: 10, width: 560, paddingLeft: 16, paddingRight: 16, boxSizing: 'border-box', maxWidth: 'calc(100vw - 32px)' }}>
@@ -374,7 +487,7 @@ export default function App() {
 
           <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
             {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
-              <button key={k} className={`tab${tab === k ? ' on' : ''}`} onClick={() => setTab(k)}>{lb}</button>
+              <button key={k} className={`tab${tab === k ? ' on' : ''}`} disabled={k === 's' && !isClosed} style={k === 's' && !isClosed ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={() => !isClosed && k === 's' ? null : setTab(k)}>{lb}</button>
             ))}
           </div>
           
@@ -412,7 +525,7 @@ export default function App() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {Object.keys(slotGroups).map((slot, idx) => (
                       <div key={slot}>
-                        {idx > 0 && <div style={{ height: '1px', background: 'var(--color-border-tertiary)', margin: '8px 0', opacity: 0.6 }} />}
+                        {idx > 0 && t.tables > 1 && <div style={{ height: '1px', background: 'var(--color-border-tertiary)', margin: '8px 0', opacity: 0.6 }} />}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {slotGroups[slot].map(m => (
                             <MatchCard key={m.id} m={m} getPlayer={getPlayer} isClosed={isClosed} onSave={saveScore} />
@@ -448,7 +561,7 @@ export default function App() {
     <div className="pg">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4, marginBottom: 16 }}>
         <div>
-          <div style={{ fontSize: 19, fontWeight: 500 }}>🏓 Ping pong</div>
+          <div style={{ fontSize: 19, fontWeight: 500 }}>🏓 Ping pong v2</div>
           <div className="mu">Clasamentul grupului</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>
@@ -459,14 +572,14 @@ export default function App() {
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <span style={{ fontWeight: 500 }}>Turnee</span>
-        <button className="btn ac sm" onClick={openCreate}>+ turneu nou</button>
+        <button className="btn ac sm" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ turneu nou</button>
       </div>
 
       {tournaments.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '48px 20px' }}>
           <div style={{ fontSize: 36, marginBottom: 12 }}>🏆</div>
           <div className="mu" style={{ marginBottom: 16 }}>Niciun turneu creat încă</div>
-          <button className="btn ac" onClick={openCreate}>Creează primul turneu</button>
+          <button className="btn ac" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>Creează primul turneu</button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
