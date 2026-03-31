@@ -14,9 +14,10 @@ export const INIT_PLAYERS = [
 export function Badge({ bg, c, children }) {
   return (
     <span style={{
-      fontSize: 17, background: bg, color: c,
-      padding: '2px 8px', borderRadius: 9999,
-      display: 'inline-flex', alignItems: 'center'
+      fontSize: 13, background: bg, color: c,
+      padding: '3px 10px', borderRadius: 9999,
+      display: 'inline-flex', alignItems: 'center',
+      fontWeight: 500,
     }}>
       {children}
     </span>
@@ -25,7 +26,11 @@ export function Badge({ bg, c, children }) {
 
 export function BackBtn({ onClick }) {
   return (
-    <button className="btn sm" style={{ border: 'none', padding: '4px 8px', flex: 1, maxWidth: 80, justifyContent: 'center' }} onClick={onClick}>
+    <button
+      className="btn sm"
+      style={{ border: 'none', background: 'transparent', minWidth: 48, justifyContent: 'center', fontSize: 22 }}
+      onClick={onClick}
+    >
       ←
     </button>
   )
@@ -33,17 +38,17 @@ export function BackBtn({ onClick }) {
 
 export function Medal({ rank }) {
   const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  if (medals[rank]) return <span style={{ fontSize: 22, lineHeight: 1 }}>{medals[rank]}</span>
-  return <span style={{ fontSize: 22, color: 'var(--color-text-secondary)', minWidth: 20, textAlign: 'center' }}>{rank}</span>
+  if (medals[rank]) return <span style={{ fontSize: 24, lineHeight: 1 }}>{medals[rank]}</span>
+  return <span style={{ fontSize: 17, color: 'var(--text2)', minWidth: 24, textAlign: 'center' }}>{rank}</span>
 }
 
 export function StandingsTable({ rows }) {
   return (
-    <div className="card" style={{ padding: '12px 16px' }}>
+    <div className="card" style={{ padding: '16px' }}>
       <table className="tbl">
         <thead>
           <tr>
-            <th style={{ width: '40%' }}>Jucător</th>
+            <th style={{ width: '45%' }}>Jucător</th>
             <th>% Vic</th>
             <th>V</th>
             <th>Î</th>
@@ -56,12 +61,12 @@ export function StandingsTable({ rows }) {
             return (
               <tr key={s.id}>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Medal rank={i + 1} />
-                    <span style={{ fontWeight: i === 0 ? 500 : 400 }}>{s.name}</span>
+                    <span style={{ fontWeight: i === 0 ? 600 : 400 }}>{s.name}</span>
                   </div>
                 </td>
-                <td style={{ fontWeight: 500, color: 'var(--ac)' }}>{pct}</td>
+                <td style={{ fontWeight: 600, color: 'var(--ac)' }}>{pct}</td>
                 <td style={{ color: 'var(--ac)' }}>{s.w}</td>
                 <td style={{ color: 'var(--danger)' }}>{s.l}</td>
                 <td>{s.pf}</td>
@@ -70,7 +75,7 @@ export function StandingsTable({ rows }) {
           })}
         </tbody>
       </table>
-      <div style={{ marginTop: 10, fontSize: 17, color: 'var(--color-text-secondary)' }}>
+      <div style={{ marginTop: 12, fontSize: 13, color: 'var(--text2)' }}>
         Departajare la egalitate: total puncte marcate
       </div>
     </div>
@@ -80,7 +85,7 @@ export function StandingsTable({ rows }) {
 export function ScoreInput({ value, onChange, onEnter, label }) {
   return (
     <div style={{ textAlign: 'center' }}>
-      <div className="mu" style={{ fontSize: 17, marginBottom: 1 }}>{label}</div>
+      <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 4 }}>{label}</div>
       <input
         className="sinp"
         type="number" min="0" max="30"
@@ -96,18 +101,20 @@ export function ScoreInput({ value, onChange, onEnter, label }) {
 
 export function ConfirmModal({ title, children, onConfirm, onCancel, confirmLabel = 'Confirmă', danger = false }) {
   return (
-    <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
-      <div className="card" style={{ width: '100%', maxWidth: 340 }}>
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+    <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 80 }}>
+      <div className="card" style={{ width: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
           {children}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={onCancel}>Anulează</button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className="btn" style={{ flex: 1 }} onClick={onCancel}>Anulează</button>
           <button
             className="btn"
             style={{
-              flex: 1, justifyContent: 'center',
-              ...(danger ? { background: 'var(--danger)', borderColor: 'var(--danger)', color: '#fff' } : { background: 'var(--ac)', borderColor: 'var(--ac)', color: '#fff' })
+              flex: 1,
+              ...(danger
+                ? { background: 'var(--danger)', borderColor: 'var(--danger)', color: '#fff' }
+                : { background: 'var(--ac)', borderColor: 'var(--ac)', color: '#fff' })
             }}
             onClick={onConfirm}
           >

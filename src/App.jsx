@@ -470,30 +470,30 @@ export default function App() {
     }
 
     return (
-      <div className="pg" style={{ paddingTop: 140 }}>
-        <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', background: 'var(--color-background-tertiary)', zIndex: 10, width: 560, paddingLeft: 16, paddingRight: 16, boxSizing: 'border-box', maxWidth: 'calc(100vw - 32px)' }}>
-          <div className="row" style={{ marginBottom: 2, paddingTop: 8, justifyContent: 'space-between' }}>
-            <BackBtn onClick={() => setView('home')} />
-            <span style={{ fontWeight: 500, fontSize: 22, textAlign: 'center', flex: 1 }}>{t.name}</span>
-            {!isClosed && (
-              <button className="btn sm" style={{ color: 'var(--danger)', borderColor: 'var(--danger)', flexShrink: 0 }} onClick={tryClose}>
-                🏁 Închide
-              </button>
-            )}
-          </div>
-          <div className="prog" style={{ marginBottom: 10 }}>
-            <div className="pf" style={{ width: `${currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%` }} />
-          </div>
-
-          <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
-            {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
-              <button key={k} className={`tab${tab === k ? ' on' : ''}`} disabled={k === 's' && !isClosed} style={k === 's' && !isClosed ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={() => !isClosed && k === 's' ? null : setTab(k)}>{lb}</button>
-            ))}
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 8, borderBottom: '0.5px solid var(--color-border-tertiary)' }}>
-            <span style={{ fontWeight: 500, fontSize: 22 }}>Runda {currentRound?.num}</span>
-            <span className="mu" style={{ fontSize: 22 }}>{currentRoundPlayed}/{currentRoundMatches.length} meciuri</span>
+      <div className="pg" style={{ paddingTop: 160 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--bg2)', zIndex: 10 }}>
+          <div style={{ maxWidth: 480, margin: '0 auto', padding: '10px 16px 0' }}>
+            <div className="row" style={{ marginBottom: 6, justifyContent: 'space-between' }}>
+              <BackBtn onClick={() => setView('home')} />
+              <span style={{ fontWeight: 600, fontSize: 17, textAlign: 'center', flex: 1 }}>{t.name}</span>
+              {!isClosed && (
+                <button className="btn sm" style={{ color: 'var(--danger)', borderColor: 'var(--danger)', flexShrink: 0 }} onClick={tryClose}>
+                  🏁 Închide
+                </button>
+              )}
+            </div>
+            <div className="prog" style={{ marginBottom: 10 }}>
+              <div className="pf" style={{ width: `${currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%` }} />
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
+                <button key={k} className={`tab${tab === k ? ' on' : ''}`} disabled={k === 's' && !isClosed} style={k === 's' && !isClosed ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={() => !isClosed && k === 's' ? null : setTab(k)}>{lb}</button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--border1)' }}>
+              <span style={{ fontWeight: 600, fontSize: 17 }}>Runda {currentRound?.num}</span>
+              <span className="mu">{currentRoundPlayed}/{currentRoundMatches.length} meciuri</span>
+            </div>
           </div>
         </div>
 
@@ -516,7 +516,7 @@ export default function App() {
                 <div key={r.id}>
                   {r.id !== currentRound?.id && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                      <span style={{ fontWeight: 500, fontSize: 21 }}>Runda {r.num}</span>
+                      <span style={{ fontWeight: 600, fontSize: 17 }}>Runda {r.num}</span>
                       {done
                         ? <Badge bg="var(--acl)" c="var(--act)">✓ completă</Badge>
                         : <span className="mu" style={{ fontSize: 22 }}>{rp}/{rms.length} meciuri</span>}
@@ -561,7 +561,7 @@ export default function App() {
     <div className="pg">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 4, marginBottom: 16 }}>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 500, cursor: 'pointer' }} onClick={() => { setView('home'); setTid(null) }}>🏓 Ping pong</div>
+          <div style={{ fontSize: 22, fontWeight: 700, cursor: 'pointer' }} onClick={() => { setView('home'); setTid(null) }}>🏓 Ping pong</div>
           <div className="mu">Clasamentul grupului</div>
         </div>
         <div style={{ display: 'flex', gap: 6 }}>

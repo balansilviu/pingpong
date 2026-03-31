@@ -14,147 +14,198 @@
   --wbg: #FAEEDA;
   --wc: #633806;
 
-  --color-background-primary: #ffffff;
-  --color-background-secondary: #f5f5f5;
-  --color-background-tertiary: #ebebeb;
-  --color-text-primary: #111111;
-  --color-text-secondary: #666666;
-  --color-border-tertiary: rgba(0,0,0,0.12);
-  --color-border-secondary: rgba(0,0,0,0.22);
-  --border-radius-md: 8px;
-  --border-radius-lg: 12px;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bg0: #ffffff;
+  --bg1: #f4f4f4;
+  --bg2: #e8e8e8;
+  --text1: #111111;
+  --text2: #666666;
+  --border1: rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.20);
+  --r-md: 10px;
+  --r-lg: 14px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Aliases pentru compatibilitate cu JSX existent */
+  --color-background-primary: var(--bg0);
+  --color-background-secondary: var(--bg1);
+  --color-background-tertiary: var(--bg2);
+  --color-text-primary: var(--text1);
+  --color-text-secondary: var(--text2);
+  --color-border-tertiary: var(--border1);
+  --color-border-secondary: var(--border2);
+  --border-radius-md: var(--r-md);
+  --border-radius-lg: var(--r-lg);
+
+  /* Sistem de mărimi */
+  --f-xs: 13px;
+  --f-sm: 15px;
+  --f-md: 17px;
+  --f-lg: 20px;
+  --f-xl: 24px;
+  --f-xxl: 30px;
 }
+
+html { font-size: 17px; }
 
 body {
-  font-family: var(--font-sans);
-  background: var(--color-background-tertiary);
-  color: var(--color-text-primary);
+  font-family: var(--font);
+  background: var(--bg2);
+  color: var(--text1);
   min-height: 100vh;
   color-scheme: light;
-  font-size: 18px;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* Buttons */
+/* ── Butoane ── */
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 12px 20px;
-  border-radius: var(--border-radius-md);
-  border: 0.5px solid var(--color-border-secondary);
-  background: var(--color-background-primary);
-  color: var(--color-text-primary);
-  font-size: 18px;
+  min-height: 50px;
+  padding: 12px 22px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border2);
+  background: var(--bg0);
+  color: var(--text1);
+  font-size: var(--f-md);
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
   transition: background 0.12s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
 }
-.btn:hover { background: var(--color-background-secondary); }
-.btn:disabled { opacity: 0.4; cursor: default; pointer-events: none; }
+.btn:hover  { background: var(--bg1); }
+.btn:active { opacity: 0.65; }
+.btn:disabled { opacity: 0.38; cursor: default; pointer-events: none; }
 .btn.ac { background: var(--ac); border-color: var(--ac); color: #fff; }
-.btn.ac:hover { opacity: 0.9; }
-.btn.sm { padding: 10px 16px; font-size: 17px; }
+.btn.ac:hover { opacity: 0.92; background: var(--ac); }
+.btn.sm { min-height: 42px; padding: 9px 18px; font-size: var(--f-sm); }
 
-/* Inputs */
+/* ── Inputuri ── */
 .inp {
   display: block;
   width: 100%;
-  padding: 13px 16px;
-  border: 0.5px solid var(--color-border-secondary);
-  border-radius: var(--border-radius-md);
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  font-size: 18px;
+  min-height: 52px;
+  padding: 14px 16px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-md);
+  background: var(--bg1);
+  color: var(--text1);
+  font-size: var(--f-md);
   font-family: inherit;
   outline: none;
 }
-.inp:focus { border-color: var(--ac); }
+.inp:focus { border-color: var(--ac); background: var(--bg0); }
 
+/* Input scor (mare, pentru cifre) */
 .sinp {
-  width: 80px;
-  padding: 6px 2px;
-  border: 0.5px solid var(--color-border-secondary);
-  border-radius: var(--border-radius-md);
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  font-size: 26px;
-  font-weight: 500;
+  width: 84px;
+  min-height: 64px;
+  padding: 8px 4px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r-md);
+  background: var(--bg1);
+  color: var(--text1);
+  font-size: 30px;
+  font-weight: 600;
   text-align: center;
   font-family: inherit;
   outline: none;
 }
-.sinp:focus { border-color: var(--ac); }
+.sinp:focus { border-color: var(--ac); background: var(--bg0); }
 
-/* Cards */
+/* ── Cards ── */
 .card {
-  background: var(--color-background-primary);
-  border: 0.5px solid var(--color-border-tertiary);
-  border-radius: var(--border-radius-lg);
-  padding: 10px;
+  background: var(--bg0);
+  border: 1px solid var(--border1);
+  border-radius: var(--r-lg);
+  padding: 16px;
 }
 
-/* Tabs */
+/* ── Tabs ── */
 .tab {
-  padding: 10px 20px;
-  border-radius: var(--border-radius-md);
+  flex: 1;
+  min-height: 46px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
   border: none;
   background: transparent;
-  color: var(--color-text-secondary);
-  font-size: 17px;
+  color: var(--text2);
+  font-size: var(--f-md);
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 .tab.on { background: var(--acl); color: var(--act); }
 
-/* Progress bar */
-.prog { height: 3px; background: var(--color-background-tertiary); border-radius: 3px; overflow: hidden; }
-.pf { height: 100%; background: var(--ac); border-radius: 3px; }
+/* ── Progress bar ── */
+.prog { height: 4px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+.pf   { height: 100%; background: var(--ac); border-radius: 4px; transition: width 0.3s; }
 
-/* Avatar */
+/* ── Avatar ── */
 .av {
-  width: 38px; height: 38px;
+  width: 42px; height: 42px;
   border-radius: 50%;
   background: var(--acl); color: var(--act);
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px; font-weight: 500; flex-shrink: 0;
+  font-size: var(--f-md); font-weight: 600; flex-shrink: 0;
 }
 
-/* Misc */
-.row { display: flex; align-items: center; gap: 10px; }
-.mu { color: var(--color-text-secondary); font-size: 17px; }
-.er { font-size: 17px; color: var(--danger); }
+/* ── Utilitare ── */
+.row { display: flex; align-items: center; gap: 12px; }
+.mu  { color: var(--text2); font-size: var(--f-sm); }
+.er  { font-size: var(--f-sm); color: var(--danger); }
 .hov { cursor: pointer; transition: background 0.12s; }
-.hov:hover { background: var(--color-background-secondary); }
+.hov:hover { background: var(--bg1); }
+
+/* Buton ștergere */
 .del {
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 0.5px solid var(--color-border-secondary);
+  display: flex; align-items: center; justify-content: center;
+  min-width: 40px; min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
   background: transparent;
-  color: var(--color-text-secondary);
-  font-size: 12px;
+  color: var(--text2);
+  font-size: var(--f-sm);
   cursor: pointer;
   font-family: inherit;
   transition: all 0.12s;
   margin-left: auto;
   flex-shrink: 0;
 }
-.del:hover { background: var(--dangerl); color: var(--danger); border-color: var(--danger); }
-.warn { background: var(--wbg); color: var(--wc); border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; }
+.del:hover  { background: var(--dangerl); color: var(--danger); border-color: var(--danger); }
+.del:active { opacity: 0.65; }
 
-/* Table */
-.tbl { width: 100%; border-collapse: collapse; font-size: 19px; }
-.tbl th { text-align: center; font-weight: 500; font-size: 16px; color: var(--color-text-secondary); padding: 0 6px 12px; white-space: nowrap; }
+/* Avertisment */
+.warn {
+  background: var(--wbg); color: var(--wc);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-size: var(--f-sm);
+}
+
+/* ── Tabel clasament ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--f-md); }
+.tbl th {
+  text-align: center; font-weight: 600;
+  font-size: var(--f-xs); color: var(--text2);
+  padding: 0 8px 14px;
+  white-space: nowrap;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
 .tbl th:first-child { text-align: left; padding-left: 0; }
-.tbl td { text-align: center; padding: 13px 6px; border-top: 0.5px solid var(--color-border-tertiary); }
+.tbl td { text-align: center; padding: 14px 8px; border-top: 1px solid var(--border1); }
 .tbl td:first-child { text-align: left; padding-left: 0; }
 .tbl tr:first-child td { border-top: none; }
 
-/* Page wrapper */
+/* ── Pagină wrapper ── */
 .pg {
-  max-width: 560px;
+  max-width: 480px;
   margin: 0 auto;
-  padding: 12px 16px 32px;
+  padding: 16px 16px 56px;
 }
