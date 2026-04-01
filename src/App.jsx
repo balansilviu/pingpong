@@ -27,6 +27,7 @@ export default function App() {
   const [delTourneyConf, setDelTourneyConf] = useState(null)
   const [closeConf, setCloseConf] = useState(null)
   const [switchTourneyConf, setSwitchTourneyConf] = useState(null)
+  const [cancelTourneyConf, setCancelTourneyConf] = useState(false)
 
   const t = tournaments.find(x => x.id === tid)
   const hasActiveTournament = tid !== null && t && !t.closed
@@ -163,6 +164,24 @@ export default function App() {
     setDelTourneyConf(null)
   }
 
+  function tryCancelTourney() {
+    const hasPlayed = tMatches.some(m => m.st === 'a')
+    if (hasPlayed) {
+      setCancelTourneyConf(true)
+    } else {
+      deleteTourney(tid)
+    }
+  }
+
+  function deleteTourney(id) {
+    setTournaments(p => p.filter(t => t.id !== id))
+    setMatches(p => p.filter(m => m.tid !== id))
+    setRounds(p => p.filter(r => r.tid !== id))
+    setTid(null)
+    setCancelTourneyConf(false)
+    setView('home')
+  }
+
   // ---- Computed stats ----
   const globalStats = useMemo(() => {
     const s = {}
@@ -266,6 +285,23 @@ export default function App() {
       {delPlayerConf.warn
         ? <div style={{ background: 'var(--dangerl)', color: 'var(--danger)', borderRadius: 8, padding: 10, fontSize: 22, textAlign: 'left', marginBottom: 8 }}>Participă în turnee existente. Se vor șterge și meciurile lui.</div>
         : <div className="mu" style={{ marginBottom: 8 }}>Această acțiune nu poate fi anulată.</div>}
+    </ConfirmModal>
+  )
+
+  if (cancelTourneyConf) return (
+    <ConfirmModal
+      danger
+      confirmLabel="Șterge turneul"
+      onConfirm={() => deleteTourney(tid)}
+      onCancel={() => setCancelTourneyConf(false)}
+    >
+      <div style={{ fontSize: 36, marginBottom: 10 }}>⚠️</div>
+      <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 10 }}>
+        Turneul este în curs!
+      </div>
+      <div className="mu" style={{ marginBottom: 8 }}>
+        Există meciuri deja jucate. Dacă ștergi turneul, se pierd toate scorurile înregistrate.
+      </div>
     </ConfirmModal>
   )
 
@@ -558,12 +594,19 @@ export default function App() {
               )
             })}
             {!isClosed && (
-              <div style={{ paddingTop: 4 }}>
+              <div style={{ paddingTop: 4, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {lastRoundDone
                   ? <button className="btn ac" style={{ width: '100%', justifyContent: 'center' }} onClick={addRound}>+ Rundă nouă</button>
                   : <button className="btn" style={{ width: '100%', justifyContent: 'center', opacity: 0.4, cursor: 'default' }} disabled>
                       + Rundă nouă (completează runda curentă mai întâi)
                     </button>}
+                <button
+                  className="btn sm"
+                  style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', marginTop: 4 }}
+                  onClick={tryCancelTourney}
+                >
+                  🗑️ Renunță la turneu
+                </button>
               </div>
             )}
           </div>
