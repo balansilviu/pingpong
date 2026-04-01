@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { PIN, INIT_PLAYERS, Badge, BackBtn, StandingsTable, ConfirmModal } from './components.jsx'
 import MatchCard from './MatchCard.jsx'
-import { gid, autoName, mkRound, sortStandings, calcStandings, unequalWarn } from './utils.js'
+import { gid, autoName, mkRound, sortStandingsGlobal, calcStandings, unequalWarn } from './utils.js'
 import { loadPlayers, loadTournaments, loadRounds, loadMatches, savePlayers, saveAll, clearAllData } from './supabase.js'
 
 export default function App() {
@@ -30,14 +30,14 @@ export default function App() {
   const [cancelTourneyConf, setCancelTourneyConf] = useState(false)
 
   const t = tournaments.find(x => x.id === tid)
-  const hasActiveTournament = tid !== null && t && !t.closed
+  const hasActiveTournament = tournaments.some(t => !t.closed)
   const tRounds = rounds.filter(r => r.tid === tid).sort((a, b) => a.num - b.num)
   const tMatches = matches.filter(m => m.tid === tid)
   const getPlayer = id => players.find(p => p.id === id)
 
   function go(v, opts = {}) {
     // Previne deschiderea unui alt turneu daca este deja un turneu deschis
-    if (v === 't' && opts.tid && tid && tid !== opts.tid) {
+    if (v === 't' && opts.tid && tid && tid !== opts.tid && !t?.closed) {
       setSwitchTourneyConf({ newTid: opts.tid, newTab: opts.tab })
       return
     }
@@ -196,7 +196,7 @@ export default function App() {
       else { s[m.p2].w++; s[m.p1].l++ }
     })
     tournaments.forEach(t => t.pids.forEach(id => { if (s[id]) s[id].tr++ }))
-    return sortStandings(Object.values(s))
+    return sortStandingsGlobal(Object.values(s))
   }, [matches, players, tournaments])
 
   const tourneyStandings = useMemo(

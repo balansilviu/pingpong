@@ -13,44 +13,60 @@ export function autoName(tournaments) {
   return same.length === 0 ? base : `${base} #${same.length + 1}`
 }
 
-export function mkRound(pids, tid, rnum) {
+export function mkRound(pids, tid, rnum, tables = 1) {
   // Generez toate meciurile
   const ms = []
   for (let i = 0; i < pids.length; i++)
     for (let j = i + 1; j < pids.length; j++)
       ms.push({ id: gid(), tid, rid: null, p1: pids[i], p2: pids[j], score: null, st: 's' })
   
-  // Reordonez meciurile și grupez în "slots" simultane
-  const ordered = optimizeMatchOrder(ms)
+  // Reordonez meciurile și grupez în "slots" simultane (max `tables` mese)
+  const ordered = optimizeMatchOrder(ms, tables)
   
   const rid = gid()
   return { round: { id: rid, tid, num: rnum }, ms: ordered.map(m => ({ ...m, rid })) }
 }
 
-function optimizeMatchOrder(matches) {
+function optimizeMatchOrder(matches, tables = 1) {
   const ordered = []
   const available = [...matches]
   let slot = 0
+  let previousSlotPlayers = new Set() // Jucatori care au jucat in slotul anterior
   
   while (available.length > 0) {
-    // Incerc sa iau max 3 meciuri simultane (6 jucatori occupied)
+    // Incerc sa iau max `tables` meciuri in slot (concurrent matches = number of tables)
     const slotMatches = []
     const usedPlayers = new Set()
     
     let nextIdx = -1
     let attempts = 0
     
-    while (available.length > 0 && attempts < 20) {
+    while (available.length > 0 && attempts < 20 && slotMatches.length < tables) {
       attempts++
       
       if (slotMatches.length === 0) {
-        // Primul meci din slot: pick random
-        nextIdx = Math.floor(Math.random() * available.length)
-      } else {
-        // Gasesc un meci care nu are jucatori comuni cu ce am deja in slot
+        // Primul meci din slot: trebuie din jucatori care NU au jucat in slot anterior
         const candidatIndices = available
           .map((m, i) => ({ i, m }))
-          .filter(({ m }) => !usedPlayers.has(m.p1) && !usedPlayers.has(m.p2))
+          .filter(({ m }) => !previousSlotPlayers.has(m.p1) && !previousSlotPlayers.has(m.p2))
+          .map(({ i }) => i)
+        
+        if (candidatIndices.length === 0) {
+          // Nu gasesc meciuri cu jucatori care sa se odihneasca - trec la urmatorul slot
+          break
+        }
+        
+        nextIdx = candidatIndices[Math.floor(Math.random() * candidatIndices.length)]
+      } else {
+        // Gasesc un meci care:
+        // 1. Nu are jucatori comuni cu ce am deja in slot
+        // 2. Nu are jucatori din slotul anterior
+        const candidatIndices = available
+          .map((m, i) => ({ i, m }))
+          .filter(({ m }) => 
+            !usedPlayers.has(m.p1) && !usedPlayers.has(m.p2) &&
+            !previousSlotPlayers.has(m.p1) && !previousSlotPlayers.has(m.p2)
+          )
           .map(({ i }) => i)
         
         if (candidatIndices.length === 0) {
@@ -69,6 +85,7 @@ function optimizeMatchOrder(matches) {
     }
     
     ordered.push(...slotMatches)
+    previousSlotPlayers = new Set(usedPlayers) // Jucatorii din acest slot devin "anterior"
     slot++
   }
   
@@ -77,13 +94,33 @@ function optimizeMatchOrder(matches) {
 
 export function valScore(a, b) {
   if (isNaN(a) || isNaN(b) || a < 0 || b < 0) return 'Scoruri invalide'
-  if (a === b) return 'Nu poate fi egalitate'
-  if (a > 30 || b > 30) return 'Scor prea mare'
-  return null
+  
+  // Scoruri speciale (victorii timpurii sau deuce)
+  const specialScores = [[6, 0], [0, 6], [9, 1], [1, 9], [12, 10], [10, 12]]
+  if (specialScores.some(([x, y]) => a === x && b === y)) return null
+  
+  // Normal game: unul are 11, celălalt 2-9 (nu 0, 1, 10)
+  if (a === 11 && b >= 2 && b <= 9) return null
+  if (b === 11 && a >= 2 && a <= 9) return null
+  
+  return 'Scoruri valide: 11 (cu 2-9), 6-0, 9-1, 12-10'
 }
 
+// Clasament turneu: victorii → diferență puncte → puncte marcate
 export function sortStandings(arr) {
   return [...arr].sort((a, b) => {
+    if (b.w !== a.w) return b.w - a.w
+    const diffA = a.pf - a.pa
+    const diffB = b.pf - b.pa
+    if (diffB !== diffA) return diffB - diffA
+    return b.pf - a.pf
+  })
+}
+
+// Clasament global: victorii → procent victorii → puncte marcate
+export function sortStandingsGlobal(arr) {
+  return [...arr].sort((a, b) => {
+    if (b.w !== a.w) return b.w - a.w
     const pa = a.n > 0 ? a.w / a.n : 0
     const pb = b.n > 0 ? b.w / b.n : 0
     if (Math.abs(pb - pa) > 0.0001) return pb - pa
