@@ -29,6 +29,7 @@ export default function App() {
   const [switchTourneyConf, setSwitchTourneyConf] = useState(null)
 
   const t = tournaments.find(x => x.id === tid)
+  const hasActiveTournament = tid !== null && t && !t.closed
   const tRounds = rounds.filter(r => r.tid === tid).sort((a, b) => a.num - b.num)
   const tMatches = matches.filter(m => m.tid === tid)
   const getPlayer = id => players.find(p => p.id === id)
@@ -594,7 +595,7 @@ export default function App() {
 
       <div className="sec-hd">
         <span className="sec-hd-title">Turnee</span>
-        <button className="btn ac sm" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ Turneu nou</button>
+        <button className="btn ac sm" disabled={hasActiveTournament} style={hasActiveTournament ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ Turneu nou</button>
       </div>
 
       {tournaments.length === 0 ? (
@@ -602,7 +603,7 @@ export default function App() {
           <div style={{ fontSize: 48, marginBottom: 14 }}>🏆</div>
           <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 6 }}>Niciun turneu creat</div>
           <div className="mu" style={{ marginBottom: 20 }}>Apasă butonul de mai jos pentru a începe</div>
-          <button className="btn ac lg" disabled={tid !== null} style={tid !== null ? { opacity: 0.4, cursor: 'not-allowed', width: '100%' } : { width: '100%' }} onClick={openCreate}>Creează primul turneu</button>
+          <button className="btn ac lg" disabled={hasActiveTournament} style={hasActiveTournament ? { opacity: 0.4, cursor: 'not-allowed', width: '100%' } : { width: '100%' }} onClick={openCreate}>Creează primul turneu</button>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
