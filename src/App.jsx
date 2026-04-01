@@ -515,11 +515,7 @@ export default function App() {
             <div className="row" style={{ marginBottom: 10, justifyContent: 'space-between' }}>
               <BackBtn onClick={() => setView('home')} color="#fff" />
               <span style={{ fontWeight: 700, fontSize: 18, textAlign: 'center', flex: 1, color: '#fff' }}>{t.name}</span>
-              {!isClosed && (
-                <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff', flexShrink: 0 }} onClick={tryClose}>
-                  🏁 Închide
-                </button>
-              )}
+              <div style={{ minWidth: 48 }} />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
               {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
@@ -600,13 +596,18 @@ export default function App() {
                   : <button className="btn" style={{ width: '100%', justifyContent: 'center', opacity: 0.4, cursor: 'default' }} disabled>
                       + Rundă nouă (completează runda curentă mai întâi)
                     </button>}
-                <button
-                  className="btn sm"
-                  style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', marginTop: 4 }}
-                  onClick={tryCancelTourney}
-                >
-                  🗑️ Renunță la turneu
+                <button className="btn" style={{ width: '100%', justifyContent: 'center', borderColor: 'var(--green)', color: 'var(--green)', fontWeight: 700 }} onClick={tryClose}>
+                  🏁 Final de turneu
                 </button>
+                <div style={{ borderTop: '1px solid var(--border)', marginTop: 12, paddingTop: 16, textAlign: 'center' }}>
+                  <button
+                    className="btn sm"
+                    style={{ color: 'var(--red)', borderColor: 'rgba(217,48,37,0.3)', fontSize: 13, minHeight: 36, padding: '6px 16px' }}
+                    onClick={tryCancelTourney}
+                  >
+                    🗑️ Renunță la turneu
+                  </button>
+                </div>
               </div>
             )}
           </div>
