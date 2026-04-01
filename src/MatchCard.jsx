@@ -73,9 +73,8 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
 
       {open && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <ScoreInput value={s1} onChange={v => { setS1(v); setErr('') }} label={p1?.name} />
-            <span style={{ color: 'var(--text2)', fontSize: 28, fontWeight: 300 }}>–</span>
             <ScoreInput value={s2} onChange={v => { setS2(v); setErr('') }} label={p2?.name} />
           </div>
           <button className="btn ac" style={{ width: '100%', justifyContent: 'center', marginTop: 12 }} onClick={save}>Salvează</button>

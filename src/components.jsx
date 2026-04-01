@@ -85,22 +85,26 @@ export function StandingsTable({ rows }) {
 }
 
 export function ScoreInput({ value, onChange, label }) {
-  const n = parseInt(value) || 0
+  const selected = parseInt(value) || 0
+  const nums = [0,1,2,3,4,5,6,7,8,9,10,11,12]
   return (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 6 }}>{label}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-        <button type="button" className="btn sm"
-          style={{ minWidth: 56, minHeight: 44, fontSize: 22, padding: '0 12px' }}
-          onClick={() => onChange(String(Math.min(12, n + 1)))}>▲</button>
-        <div style={{
-          width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 38, fontWeight: 800, background: 'var(--muted)', borderRadius: 14,
-          border: '2px solid rgba(0,0,0,0.10)'
-        }}>{n}</div>
-        <button type="button" className="btn sm"
-          style={{ minWidth: 56, minHeight: 44, fontSize: 22, padding: '0 12px' }}
-          onClick={() => onChange(String(Math.max(0, n - 1)))}>▼</button>
+    <div>
+      <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 8, textAlign: 'center', fontWeight: 600 }}>{label}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 6 }}>
+        {nums.map(n => (
+          <button
+            key={n} type="button"
+            onClick={() => onChange(String(n))}
+            style={{
+              minHeight: 44, borderRadius: 10, border: 'none',
+              background: selected === n ? 'var(--green)' : 'var(--muted)',
+              color: selected === n ? '#fff' : 'var(--text)',
+              fontSize: 17, fontWeight: selected === n ? 700 : 400,
+              cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'background 0.1s',
+            }}
+          >{n}</button>
+        ))}
       </div>
     </div>
   )
