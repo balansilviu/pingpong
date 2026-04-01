@@ -87,11 +87,6 @@ export default function App() {
 
   // ---- Tournament creation ----
   function openCreate() {
-    if (tid) {
-      // Un turneu este deschis, nu permite crearea unuia nou
-      alert('Un turneu este deja deschis. Te rog să te întorci la el sau să-l închiezi înainte de a crea altul.')
-      return
-    }
     setTourneyName(autoName(tournaments))
     setSelectedPlayers([])
     setNumTables(1)
@@ -137,7 +132,8 @@ export default function App() {
     setTournaments(p => p.map(t => t.id === closeConf.tid ? { ...t, closed: true } : t))
     setMatches(p => p.map(m => m.tid === closeConf.tid && m.st === 's' ? { ...m, st: 'x' } : m))
     setCloseConf(null)
-    go('t', { tid: closeConf.tid, tab: 's' })
+    setTid(null)
+    setView('home')
   }
 
   // ---- Admin actions ----
@@ -641,6 +637,11 @@ export default function App() {
         <span className="sec-hd-title">Turnee</span>
         <button className="btn ac sm" disabled={hasActiveTournament} style={hasActiveTournament ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ Turneu nou</button>
       </div>
+      {hasActiveTournament && (
+        <div style={{ fontSize: 13, color: 'var(--greend)', background: 'var(--greenl)', borderRadius: 10, padding: '8px 12px', marginBottom: 10 }}>
+          ● Există un turneu activ. Închide-l înainte de a crea unul nou.
+        </div>
+      )}
 
       {tournaments.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '52px 20px' }}>
