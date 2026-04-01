@@ -29,6 +29,7 @@ export default function App() {
   const [closeConf, setCloseConf] = useState(null)
   const [switchTourneyConf, setSwitchTourneyConf] = useState(null)
   const [cancelTourneyConf, setCancelTourneyConf] = useState(false)
+  const [openMatchId, setOpenMatchId] = useState(null)
 
   const t = tournaments.find(x => x.id === tid)
   const hasActiveTournament = tournaments.some(t => !t.closed)
@@ -591,7 +592,7 @@ export default function App() {
                         {idx > 0 && t.tables > 1 && <div style={{ height: '1px', background: 'var(--color-border-tertiary)', margin: '8px 0', opacity: 0.6 }} />}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                           {slotGroups[slot].map(m => (
-                            <MatchCard key={m.id} m={m} getPlayer={getPlayer} isClosed={isClosed} onSave={saveScore} />
+                            <MatchCard key={m.id} m={m} getPlayer={getPlayer} isClosed={isClosed} onSave={saveScore} openMatchId={openMatchId} setOpenMatchId={setOpenMatchId} />
                           ))}
                         </div>
                       </div>

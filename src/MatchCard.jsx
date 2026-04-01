@@ -1,12 +1,41 @@
-import React, { useState } from 'react'
-import { ScoreInput } from './components.jsx'
+import React, { useState, useEffect } from 'react'
 import { valScore } from './utils.js'
 
-export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
-  const [open, setOpen] = useState(false)
+const SCORES = [12,11,10,9,8,7,6,5,4,3,2,1,0]
+
+function ScoreCol({ value, onChange, label }) {
+  const selected = parseInt(value) || 0
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      <div style={{ fontSize: 13, color: 'var(--text2)', fontWeight: 600, marginBottom: 4, textAlign: 'center' }}>{label}</div>
+      {SCORES.map(n => (
+        <button
+          key={n} type="button"
+          onClick={() => onChange(String(n))}
+          style={{
+            width: '100%', height: 40, borderRadius: 10, border: 'none',
+            background: selected === n ? 'var(--green)' : 'var(--muted)',
+            color: selected === n ? '#fff' : 'var(--text)',
+            fontSize: 17, fontWeight: selected === n ? 700 : 400,
+            cursor: 'pointer', fontFamily: 'inherit',
+            transition: 'background 0.1s',
+          }}
+        >{n}</button>
+      ))}
+    </div>
+  )
+}
+
+export default function MatchCard({ m, getPlayer, isClosed, onSave, openMatchId, setOpenMatchId }) {
   const [s1, setS1] = useState('0')
   const [s2, setS2] = useState('0')
   const [err, setErr] = useState('')
+
+  const open = openMatchId === m.id
+
+  useEffect(() => {
+    if (!open) { setS1('0'); setS2('0'); setErr('') }
+  }, [open])
 
   const p1 = getPlayer(m.p1)
   const p2 = getPlayer(m.p2)
@@ -19,14 +48,12 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
     const e = valScore(a, b)
     if (e) { setErr(e); return }
     onSave(m.id, a, b)
-    setOpen(false); setS1('0'); setS2('0'); setErr('')
+    setOpenMatchId(null)
   }
 
   function toggle() {
-    setOpen(o => {
-      if (o) { setS1('0'); setS2('0'); setErr('') }
-      return !o
-    })
+    setOpenMatchId(open ? null : m.id)
+    setErr('')
   }
 
   return (
@@ -43,18 +70,13 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
 
         <div style={{ minWidth: 100, textAlign: 'center', flexShrink: 0 }}>
           {isA
-            ? <span style={{
-                fontSize: 22, fontWeight: 800, letterSpacing: 2,
-                color: 'var(--text)',
-              }}>{m.score[0]} – {m.score[1]}</span>
+            ? <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2 }}>{m.score[0]} – {m.score[1]}</span>
             : isClosed
               ? <span style={{ fontSize: 14, color: 'var(--text2)' }}>nejucat</span>
               : <button
                   className="btn ac sm"
                   onClick={toggle}
-                  style={open
-                    ? { background: 'var(--muted)', color: 'var(--text)', borderColor: 'rgba(0,0,0,0.12)' }
-                    : {}}
+                  style={open ? { background: 'var(--muted)', color: 'var(--text)', borderColor: 'rgba(0,0,0,0.12)' } : {}}
                 >
                   {open ? '✕' : '+ scor'}
                 </button>
@@ -73,12 +95,12 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
 
       {open && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <ScoreInput value={s1} onChange={v => { setS1(v); setErr('') }} label={p1?.name} />
-            <ScoreInput value={s2} onChange={v => { setS2(v); setErr('') }} label={p2?.name} />
+          <div style={{ display: 'flex', gap: 10 }}>
+            <ScoreCol value={s1} onChange={v => { setS1(v); setErr('') }} label={p1?.name} />
+            <ScoreCol value={s2} onChange={v => { setS2(v); setErr('') }} label={p2?.name} />
           </div>
-          <button className="btn ac" style={{ width: '100%', justifyContent: 'center', marginTop: 12 }} onClick={save}>Salvează</button>
           {err && <div className="er" style={{ textAlign: 'center', marginTop: 8 }}>{err}</div>}
+          <button className="btn ac" style={{ width: '100%', justifyContent: 'center', marginTop: 12 }} onClick={save}>Salvează</button>
         </div>
       )}
     </div>
