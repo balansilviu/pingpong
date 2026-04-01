@@ -34,16 +34,23 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave, openMatchId,
   const [err, setErr] = useState('')
 
   const open = openMatchId === m.id
+  const isA = m.st === 'a'
+  const w1 = isA && m.score[0] > m.score[1]
+  const w2 = isA && m.score[1] > m.score[0]
 
   useEffect(() => {
-    if (!open) { setS1('0'); setS2('0'); setErr('') }
+    if (open) {
+      // Pre-completează cu scorul existent dacă meciul e deja jucat
+      setS1(isA ? String(m.score[0]) : '0')
+      setS2(isA ? String(m.score[1]) : '0')
+      setErr('')
+    } else {
+      setS1('0'); setS2('0'); setErr('')
+    }
   }, [open])
 
   const p1 = getPlayer(m.p1)
   const p2 = getPlayer(m.p2)
-  const isA = m.st === 'a'
-  const w1 = isA && m.score[0] > m.score[1]
-  const w2 = isA && m.score[1] > m.score[0]
 
   function save() {
     const a = parseInt(s1), b = parseInt(s2)
@@ -71,18 +78,36 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave, openMatchId,
         </span>
 
         <div style={{ minWidth: 100, textAlign: 'center', flexShrink: 0 }}>
-          {isA
-            ? <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2 }}>{m.score[0]} – {m.score[1]}</span>
-            : isClosed
-              ? <span style={{ fontSize: 14, color: 'var(--text2)' }}>nejucat</span>
-              : <button
-                  className="btn ac sm"
+          {isA ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+              <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2 }}>{m.score[0]} – {m.score[1]}</span>
+              {!isClosed && (
+                <button
+                  className="btn sm"
                   onClick={toggle}
-                  style={open ? { background: 'var(--muted)', color: 'var(--text)', borderColor: 'rgba(0,0,0,0.12)' } : {}}
+                  style={{
+                    fontSize: 12, minHeight: 26, padding: '2px 10px',
+                    color: open ? 'var(--text)' : 'var(--text2)',
+                    borderColor: open ? 'rgba(0,0,0,0.12)' : 'var(--border)',
+                    background: open ? 'var(--muted)' : 'transparent',
+                    boxShadow: 'none',
+                  }}
                 >
-                  {open ? '✕' : '+ scor'}
+                  {open ? '✕ anulează' : '✏️ editează'}
                 </button>
-          }
+              )}
+            </div>
+          ) : isClosed ? (
+            <span style={{ fontSize: 14, color: 'var(--text2)' }}>nejucat</span>
+          ) : (
+            <button
+              className="btn ac sm"
+              onClick={toggle}
+              style={open ? { background: 'var(--muted)', color: 'var(--text)', borderColor: 'rgba(0,0,0,0.12)' } : {}}
+            >
+              {open ? '✕' : '+ scor'}
+            </button>
+          )}
         </div>
 
         <span style={{
