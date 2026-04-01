@@ -472,7 +472,7 @@ export default function App() {
     }
 
     return (
-      <div className="pg" style={{ paddingTop: 170 }}>
+      <div className="pg" style={{ paddingTop: 210 }}>
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--greend)', zIndex: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
           <div style={{ maxWidth: 480, margin: '0 auto', padding: '12px 16px 0' }}>
             <div className="row" style={{ marginBottom: 10, justifyContent: 'space-between' }}>
