@@ -74,6 +74,11 @@ export default function App() {
     loadData()
   }, [])
 
+  // Resetează tab la 'r' dacă turneul nu e încheiat și tab-ul e 's'
+  useEffect(() => {
+    if (view === 't' && t && !t.closed && tab === 's') setTab('r')
+  }, [view, tid, tab])
+
   // Auto-save to Supabase (only after initial load)
   useEffect(() => {
     console.log('[SAVE EFFECT] players fired, loaded=', loaded.current, 'count=', players.length)
@@ -416,9 +421,9 @@ export default function App() {
 
       <div className="card" style={{ background: 'var(--redl)', border: '1.5px solid var(--red)' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--red)', marginBottom: 12 }}>⚠️ Zonă periculoasă</div>
-        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }} onClick={() => {
+        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }} onClick={async () => {
           if (confirm('Ești sigur? Toate turnee, meciuri și scoruri vor fi șterse!')) {
-            clearAllData()
+            await clearAllData()
             setPlayers(INIT_PLAYERS)
             setTournaments([])
             setRounds([])
@@ -510,15 +515,12 @@ export default function App() {
     const totalPlayed = tMatches.filter(m => m.st === 'a').length
     const totalMs = tMatches.filter(m => m.st !== 'x').length
     
-    // Info runda curentă
-    const currentRound = tRounds[0]
+    // Info runda curentă = prima rundă cu meciuri neterminate, sau ultima rundă
+    const currentRound = tRounds.find(r =>
+      matches.some(m => m.rid === r.id && m.st === 's')
+    ) || tRounds[tRounds.length - 1]
     const currentRoundMatches = currentRound ? matches.filter(m => m.rid === currentRound.id && m.st !== 'x') : []
     const currentRoundPlayed = currentRoundMatches.filter(m => m.st === 'a').length
-
-    // Forțează tab-ul la Meciuri dacă turneul nu e încheiat
-    if (!isClosed && tab === 's') {
-      setTab('r')
-    }
 
     return (
       <div className="pg" style={{ paddingTop: 210 }}>
