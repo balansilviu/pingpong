@@ -193,7 +193,7 @@ body {
   transition: transform 0.12s, box-shadow 0.12s;
   border-left: 4px solid transparent;
 }
-.t-card.active  { border-left-color: var(--green); box-shadow: 0 2px 16px rgba(29,158,117,0.18); }
+.t-card.active  { border-left-color: var(--green); background: #F0FBF7; box-shadow: 0 4px 20px rgba(29,158,117,0.20); }
 .t-card.closed  { border-left-color: var(--text2); opacity: 0.75; }
 .t-card:active  { transform: scale(0.985); box-shadow: var(--sh-sm); }
 .t-card-name    { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
