@@ -73,12 +73,12 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave }) {
 
       {open && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, justifyContent: 'center' }}>
-            <ScoreInput value={s1} onChange={v => { setS1(v); setErr('') }} onEnter={save} label={p1?.name} />
-            <span style={{ color: 'var(--text2)', fontSize: 24, paddingBottom: 22 }}>–</span>
-            <ScoreInput value={s2} onChange={v => { setS2(v); setErr('') }} onEnter={save} label={p2?.name} />
-            <button className="btn ac sm" style={{ marginBottom: 4, flexShrink: 0 }} onClick={save}>Salvează</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center' }}>
+            <ScoreInput value={s1} onChange={v => { setS1(v); setErr('') }} label={p1?.name} />
+            <span style={{ color: 'var(--text2)', fontSize: 28, fontWeight: 300 }}>–</span>
+            <ScoreInput value={s2} onChange={v => { setS2(v); setErr('') }} label={p2?.name} />
           </div>
+          <button className="btn ac" style={{ width: '100%', justifyContent: 'center', marginTop: 12 }} onClick={save}>Salvează</button>
           {err && <div className="er" style={{ textAlign: 'center', marginTop: 8 }}>{err}</div>}
         </div>
       )}

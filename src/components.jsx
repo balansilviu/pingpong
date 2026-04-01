@@ -84,19 +84,24 @@ export function StandingsTable({ rows }) {
   )
 }
 
-export function ScoreInput({ value, onChange, onEnter, label }) {
+export function ScoreInput({ value, onChange, label }) {
+  const n = parseInt(value) || 0
   return (
     <div style={{ textAlign: 'center' }}>
-      <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 4 }}>{label}</div>
-      <input
-        className="sinp"
-        type="number" min="0" max="30"
-        value={value}
-        onFocus={e => { if (e.target.value === '0') e.target.value = '' }}
-        onBlur={e => { if (e.target.value === '') onChange('0') }}
-        onInput={e => onChange(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && onEnter()}
-      />
+      <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 6 }}>{label}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+        <button type="button" className="btn sm"
+          style={{ minWidth: 56, minHeight: 44, fontSize: 22, padding: '0 12px' }}
+          onClick={() => onChange(String(Math.min(12, n + 1)))}>▲</button>
+        <div style={{
+          width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 38, fontWeight: 800, background: 'var(--muted)', borderRadius: 14,
+          border: '2px solid rgba(0,0,0,0.10)'
+        }}>{n}</div>
+        <button type="button" className="btn sm"
+          style={{ minWidth: 56, minHeight: 44, fontSize: 22, padding: '0 12px' }}
+          onClick={() => onChange(String(Math.max(0, n - 1)))}>▼</button>
+      </div>
     </div>
   )
 }
