@@ -140,7 +140,10 @@ export function calcStandings(matches, pids, players) {
     if (a > b) { s[m.p1].w++; s[m.p2].l++ }
     else { s[m.p2].w++; s[m.p1].l++ }
   })
-  return sortStandings(pids.map(id => ({ ...players.find(p => p.id === id), ...s[id] })))
+  return sortStandings(pids.map(id => {
+    const player = players.find(p => p.id === id)
+    return { id, name: player?.name ?? '(șters)', ...s[id] }
+  }))
 }
 
 export function unequalWarn(matches, pids) {
@@ -151,6 +154,7 @@ export function unequalWarn(matches, pids) {
     counts[m.p2] = (counts[m.p2] || 0) + 1
   })
   const vals = pids.map(id => counts[id])
+  if (vals.length === 0) return null
   const mn = Math.min(...vals), mx = Math.max(...vals)
   return mn === mx ? null : { min: mn, max: mx, counts }
 }

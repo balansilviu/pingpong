@@ -3,23 +3,16 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-console.log('[supabase] URL defined:', !!supabaseUrl, 'KEY defined:', !!supabaseKey)
-
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Salvează jucători
 export async function savePlayers(players) {
   try {
-    console.log('Saving players:', players.length, 'rows')
-    const { data, error } = await supabase.from('players').upsert(
+    const { error } = await supabase.from('players').upsert(
       players.map(p => ({ id: p.id, name: p.name })),
       { onConflict: 'id' }
     )
-    if (error) {
-      console.error('Supabase players error:', error)
-      return
-    }
-    console.log('Players saved:', data?.length || 0)
+    if (error) console.error('Supabase players error:', error)
   } catch (err) {
     console.error('Save players error:', err)
   }
@@ -71,7 +64,6 @@ export async function saveAll(tournaments, rounds, matches) {
     if (tIds.length > 0) await supabase.from('tournaments').delete().not('id', 'in', `(${tIds.join(',')})`)
     else await supabase.from('tournaments').delete().neq('id', '')
 
-    console.log('[saveAll] done')
   } catch (err) {
     console.error('[saveAll] exception:', err)
   }

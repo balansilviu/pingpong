@@ -34,7 +34,7 @@ export default function MatchCard({ m, getPlayer, isClosed, onSave, openMatchId,
   const [err, setErr] = useState('')
 
   const open = openMatchId === m.id
-  const isA = m.st === 'a'
+  const isA = m.st === 'a' && Array.isArray(m.score)
   const w1 = isA && m.score[0] > m.score[1]
   const w2 = isA && m.score[1] > m.score[0]
 

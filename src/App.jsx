@@ -51,23 +51,17 @@ export default function App() {
   // Load data from Supabase on mount
   useEffect(() => {
     async function loadData() {
-      console.log('loadData: Starting...')
       const [p, t, r, m] = await Promise.all([
         loadPlayers(),
         loadTournaments(),
         loadRounds(),
         loadMatches()
       ])
-      console.log('loadData results:', { players: p.length, tournaments: t.length, rounds: r.length, matches: m.length })
-      console.log('loadData tournaments data:', t)
-      console.log('loadData rounds data:', r)
-      console.log('loadData matches data:', m)
       if (p.length > 0) setPlayers(p)
       if (t.length > 0) setTournaments(t)
       if (r.length > 0) setRounds(r)
       if (m.length > 0) setMatches(m)
       await new Promise(resolve => setTimeout(resolve, 0))
-      console.log('[LOAD] Setting loaded=true')
       loaded.current = true
       setLoading(false)
     }
@@ -81,15 +75,13 @@ export default function App() {
 
   // Auto-save to Supabase (only after initial load)
   useEffect(() => {
-    console.log('[SAVE EFFECT] players fired, loaded=', loaded.current, 'count=', players.length)
-    if (!loaded.current) { console.log('[SAVE EFFECT] players SKIPPED (not loaded yet)'); return }
+    if (!loaded.current) return
     savePlayers(players)
   }, [players])
 
   // Salvează tournaments → rounds → matches în ordine (FK constraints)
   useEffect(() => {
-    console.log('[SAVE EFFECT] t/r/m fired, loaded=', loaded.current, 't=', tournaments.length, 'r=', rounds.length, 'm=', matches.length)
-    if (!loaded.current) { console.log('[SAVE EFFECT] t/r/m SKIPPED'); return }
+    if (!loaded.current) return
     saveAll(tournaments, rounds, matches)
   }, [tournaments, rounds, matches])
 
