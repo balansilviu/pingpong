@@ -644,6 +644,15 @@ export default function App() {
           <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
             <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff' }} onClick={() => setView('g')}>📈</button>
             <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff' }} onClick={() => { setView('al'); setPin(''); setPinErr(false) }}>🔐</button>
+            <button className="btn sm" style={{ background: 'rgba(255,255,255,0.18)', border: '1.5px solid rgba(255,255,255,0.4)', color: '#fff' }} onClick={async () => {
+              const url = window.location.href
+              if (navigator.share) {
+                await navigator.share({ title: '🏓 Ping Pong', url })
+              } else {
+                await navigator.clipboard.writeText(url)
+                alert('Link copiat!')
+              }
+            }}>🔗</button>
           </div>
         </div>
       </div>
