@@ -445,7 +445,13 @@ export default function App() {
           <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center' }}>
             <div style={{ flex: 1 }}>
               <div className="mu" style={{ marginBottom: 5 }}>Numărul de mese</div>
-              <input className="inp" type="number" min="1" value={numTables} onInput={e => setNumTables(Math.max(1, parseInt(e.target.value) || 1))} style={{ width: '100%' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <button type="button" className="btn sm" style={{ minWidth: 48, fontSize: 22, padding: '0 16px' }}
+                  onClick={() => setNumTables(n => Math.max(1, n - 1))}>−</button>
+                <span style={{ fontSize: 26, fontWeight: 700, minWidth: 32, textAlign: 'center' }}>{numTables}</span>
+                <button type="button" className="btn sm" style={{ minWidth: 48, fontSize: 22, padding: '0 16px' }}
+                  onClick={() => setNumTables(n => n + 1)}>+</button>
+              </div>
             </div>
           </div>
           
