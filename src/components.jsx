@@ -48,16 +48,16 @@ export function StandingsTable({ rows }) {
       <table className="tbl">
         <thead>
           <tr>
-            <th style={{ width: '45%' }}>Jucător</th>
-            <th>% Vic</th>
+            <th style={{ width: '40%' }}>Jucător</th>
             <th>V</th>
             <th>Î</th>
-            <th>Pct</th>
+            <th style={{ color: 'var(--text2)', fontWeight: 500 }}>+/−</th>
+            <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((s, i) => {
-            const pct = s.n > 0 ? Math.round(s.w / s.n * 100) + '%' : '-'
+            const diff = s.w - s.l
             return (
               <tr key={s.id}>
                 <td>
@@ -66,17 +66,19 @@ export function StandingsTable({ rows }) {
                     <span style={{ fontWeight: i === 0 ? 700 : 500, fontSize: 17 }}>{s.name}</span>
                   </div>
                 </td>
-                <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 17 }}>{pct}</td>
-                <td style={{ color: 'var(--ac)', fontSize: 17 }}>{s.w}</td>
-                <td style={{ color: 'var(--danger)', fontSize: 17 }}>{s.l}</td>
-                <td style={{ fontSize: 17 }}>{s.pf}</td>
+                <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19 }}>{s.w}</td>
+                <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19 }}>{s.l}</td>
+                <td style={{ fontSize: 15, color: diff > 0 ? 'var(--ac)' : diff < 0 ? 'var(--danger)' : 'var(--text2)' }}>
+                  {diff > 0 ? '+' : ''}{diff}
+                </td>
+                <td style={{ fontSize: 15, color: 'var(--text2)' }}>{s.pf}</td>
               </tr>
             )
           })}
         </tbody>
       </table>
-      <div style={{ marginTop: 14, fontSize: 14, color: 'var(--text2)' }}>
-        Departajare la egalitate: total puncte marcate
+      <div style={{ marginTop: 14, fontSize: 13, color: 'var(--text2)' }}>
+        Departajare: diferență V−Î, apoi puncte marcate
       </div>
     </div>
   )
