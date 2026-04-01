@@ -11,6 +11,7 @@ export default function App() {
   const [matches, setMatches] = useState([])
 
   const loaded = useRef(false)
+  const [loading, setLoading] = useState(true)
 
   const [view, setView] = useState('home') // home | c | t | g | a | al
   const [tid, setTid] = useState(null)
@@ -67,6 +68,7 @@ export default function App() {
       await new Promise(resolve => setTimeout(resolve, 0))
       console.log('[LOAD] Setting loaded=true')
       loaded.current = true
+      setLoading(false)
     }
     loadData()
   }, [])
@@ -205,6 +207,13 @@ export default function App() {
   const lastRoundDone = lastRoundMs.length > 0 && lastRoundMs.every(m => m.st === 'a' || m.st === 'x')
 
   // ---- Modals ----
+  if (loading) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', gap: 16 }}>
+      <div style={{ fontSize: 48 }}>🏓</div>
+      <div style={{ fontSize: 17, color: 'var(--text2)', fontWeight: 500 }}>Se încarcă...</div>
+    </div>
+  )
+
   if (switchTourneyConf) return (
     <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
       <div className="card" style={{ width: '100%', maxWidth: 340 }}>
