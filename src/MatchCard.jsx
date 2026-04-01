@@ -6,22 +6,24 @@ const SCORES = [12,11,10,9,8,7,6,5,4,3,2,1,0]
 function ScoreCol({ value, onChange, label }) {
   const selected = parseInt(value) || 0
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-      <div style={{ fontSize: 13, color: 'var(--text2)', fontWeight: 600, marginBottom: 4, textAlign: 'center' }}>{label}</div>
-      {SCORES.map(n => (
-        <button
-          key={n} type="button"
-          onClick={() => onChange(String(n))}
-          style={{
-            width: '100%', height: 40, borderRadius: 10, border: 'none',
-            background: selected === n ? 'var(--green)' : 'var(--muted)',
-            color: selected === n ? '#fff' : 'var(--text)',
-            fontSize: 17, fontWeight: selected === n ? 700 : 400,
-            cursor: 'pointer', fontFamily: 'inherit',
-            transition: 'background 0.1s',
-          }}
-        >{n}</button>
-      ))}
+    <div style={{ flex: 1 }}>
+      <div style={{ fontSize: 13, color: 'var(--text2)', fontWeight: 600, marginBottom: 6, textAlign: 'center' }}>{label}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+        {SCORES.map(n => (
+          <button
+            key={n} type="button"
+            onClick={() => onChange(String(n))}
+            style={{
+              height: 40, borderRadius: 10, border: 'none',
+              background: selected === n ? 'var(--green)' : 'var(--muted)',
+              color: selected === n ? '#fff' : 'var(--text)',
+              fontSize: 17, fontWeight: selected === n ? 700 : 400,
+              cursor: 'pointer', fontFamily: 'inherit',
+              transition: 'background 0.1s',
+            }}
+          >{n}</button>
+        ))}
+      </div>
     </div>
   )
 }
