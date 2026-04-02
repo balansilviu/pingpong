@@ -32,6 +32,7 @@ export default function App() {
   const [openMatchId, setOpenMatchId] = useState(null)
   const [restoreConf, setRestoreConf] = useState(null)
   const fileInputRef = useRef(null)
+  const [syncStatus, setSyncStatus] = useState('ok') // 'ok' | 'saving' | 'error'
 
   const t = tournaments.find(x => x.id === tid)
   const hasActiveTournament = tournaments.some(t => !t.closed)
@@ -78,13 +79,15 @@ export default function App() {
   // Auto-save to Supabase (only after initial load)
   useEffect(() => {
     if (!loaded.current) return
-    savePlayers(players)
+    setSyncStatus('saving')
+    savePlayers(players).then(ok => setSyncStatus(ok ? 'ok' : 'error'))
   }, [players])
 
   // Salvează tournaments → rounds → matches în ordine (FK constraints)
   useEffect(() => {
     if (!loaded.current) return
-    saveAll(tournaments, rounds, matches)
+    setSyncStatus('saving')
+    saveAll(tournaments, rounds, matches).then(ok => setSyncStatus(ok ? 'ok' : 'error'))
   }, [tournaments, rounds, matches])
 
   // ---- Tournament creation ----
@@ -222,6 +225,25 @@ export default function App() {
     setRestoreConf(null)
     setView('home')
   }
+
+  // ---- Sync indicator ----
+  const syncDot = (
+    <div style={{
+      position: 'fixed', bottom: 16, right: 16, zIndex: 200,
+      display: 'flex', alignItems: 'center', gap: 6,
+      background: 'var(--card, #fff)', border: '1px solid var(--border)',
+      borderRadius: 999, padding: '5px 10px', fontSize: 13,
+      boxShadow: '0 1px 6px rgba(0,0,0,0.08)',
+      color: syncStatus === 'error' ? 'var(--danger)' : syncStatus === 'saving' ? '#f59e0b' : 'var(--text2)',
+      pointerEvents: 'none',
+    }}>
+      <span style={{
+        width: 7, height: 7, borderRadius: '50%', flexShrink: 0,
+        background: syncStatus === 'error' ? 'var(--danger)' : syncStatus === 'saving' ? '#f59e0b' : 'var(--green)',
+      }} />
+      {syncStatus === 'saving' ? 'Se salvează...' : syncStatus === 'error' ? 'Eroare sync' : 'Sincronizat'}
+    </div>
+  )
 
   // ---- Computed stats ----
   const globalStats = useMemo(() => {
@@ -422,7 +444,7 @@ export default function App() {
 
   // ---- Admin panel ----
   if (view === 'a') return (
-    <div className="pg">
+    <div className="pg">{syncDot}
       <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
         <BackBtn onClick={() => setView('home')} />
         <span style={{ fontWeight: 700, fontSize: 24, flex: 1 }}>Admin</span>
@@ -583,7 +605,7 @@ export default function App() {
     })
     const ps = globalStats.filter(s => s.n > 0)
     return (
-      <div className="pg">
+      <div className="pg">{syncDot}
         <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
           <BackBtn onClick={() => setView('home')} />
           <span style={{ fontWeight: 700, fontSize: 24 }}>Statistici globale</span>
@@ -602,8 +624,8 @@ export default function App() {
                       <th style={{ width: '30%' }}>Adversar</th>
                       <th style={{ width: '10%' }}>V</th>
                       <th style={{ width: '10%' }}>Î</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>+Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -662,7 +684,7 @@ export default function App() {
     const currentRoundPlayed = currentRoundMatches.filter(m => m.st === 'a').length
 
     return (
-      <div className="pg" style={{ paddingTop: 210 }}>
+      <div className="pg" style={{ paddingTop: 210 }}>{syncDot}
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--greend)', zIndex: 10, boxShadow: '0 2px 12px rgba(0,0,0,0.18)' }}>
           <div style={{ maxWidth: 480, margin: '0 auto', padding: '12px 16px 0' }}>
             <div className="row" style={{ marginBottom: 10, justifyContent: 'space-between' }}>
@@ -806,8 +828,8 @@ export default function App() {
                       <th style={{ width: '30%' }}>Adversar</th>
                       <th style={{ width: '10%' }}>V</th>
                       <th style={{ width: '10%' }}>Î</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>+Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -879,7 +901,7 @@ export default function App() {
 
   // ---- Home ----
   return (
-    <div className="pg">
+    <div className="pg">{syncDot}
       {/* Hero */}
       <div className="home-hero">
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>

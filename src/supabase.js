@@ -12,9 +12,11 @@ export async function savePlayers(players) {
       players.map(p => ({ id: p.id, name: p.name })),
       { onConflict: 'id' }
     )
-    if (error) console.error('Supabase players error:', error)
+    if (error) { console.error('Supabase players error:', error); return false }
+    return true
   } catch (err) {
     console.error('Save players error:', err)
+    return false
   }
 }
 
@@ -37,18 +39,18 @@ export async function saveAll(tournaments, rounds, matches) {
     // 1. Upsert în ordine FK
     if (tournaments.length > 0) {
       const { error } = await supabase.from('tournaments').upsert(tournaments, { onConflict: 'id' })
-      if (error) { console.error('[saveAll] tournaments upsert error:', error); return }
+      if (error) { console.error('[saveAll] tournaments upsert error:', error); return false }
     }
     if (rounds.length > 0) {
       const { error } = await supabase.from('rounds').upsert(
         rounds.map(r => ({ id: r.id, tid: r.tid, num: r.num })),
         { onConflict: 'id' }
       )
-      if (error) { console.error('[saveAll] rounds upsert error:', error); return }
+      if (error) { console.error('[saveAll] rounds upsert error:', error); return false }
     }
     if (matches.length > 0) {
       const { error } = await supabase.from('matches').upsert(matches, { onConflict: 'id' })
-      if (error) { console.error('[saveAll] matches upsert error:', error); return }
+      if (error) { console.error('[saveAll] matches upsert error:', error); return false }
     }
 
     // 2. Șterge înregistrările eliminate, în ordine inversă FK (children first)
@@ -64,8 +66,10 @@ export async function saveAll(tournaments, rounds, matches) {
     if (tIds.length > 0) await supabase.from('tournaments').delete().not('id', 'in', `(${tIds.join(',')})`)
     else await supabase.from('tournaments').delete().neq('id', '')
 
+    return true
   } catch (err) {
     console.error('[saveAll] exception:', err)
+    return false
   }
 }
 
