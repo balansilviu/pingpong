@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
-import { PIN, INIT_PLAYERS, Badge, BackBtn, StandingsTable, ConfirmModal } from './components.jsx'
+import { PIN, INIT_PLAYERS, Badge, BackBtn, Medal, StandingsTable, ConfirmModal } from './components.jsx'
 import MatchCard from './MatchCard.jsx'
 import { gid, autoName, mkRound, sortStandingsGlobal, calcStandings, unequalWarn } from './utils.js'
 import { loadPlayers, loadTournaments, loadRounds, loadMatches, savePlayers, saveAll, clearAllData } from './supabase.js'
@@ -30,6 +30,8 @@ export default function App() {
   const [switchTourneyConf, setSwitchTourneyConf] = useState(null)
   const [cancelTourneyConf, setCancelTourneyConf] = useState(false)
   const [openMatchId, setOpenMatchId] = useState(null)
+  const [restoreConf, setRestoreConf] = useState(null)
+  const fileInputRef = useRef(null)
 
   const t = tournaments.find(x => x.id === tid)
   const hasActiveTournament = tournaments.some(t => !t.closed)
@@ -178,6 +180,49 @@ export default function App() {
     setView('home')
   }
 
+  // ---- Backup / Restore ----
+  function exportBackup() {
+    const data = { players, tournaments, rounds, matches, exportedAt: new Date().toISOString() }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `pingpong-backup-${new Date().toLocaleDateString('ro-RO').replace(/\./g, '-')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  function handleRestoreFile(e) {
+    const file = e.target.files[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result)
+        if (!Array.isArray(data.players) || !Array.isArray(data.tournaments) ||
+            !Array.isArray(data.rounds) || !Array.isArray(data.matches)) {
+          alert('Fișier invalid: lipsesc date.')
+          return
+        }
+        setRestoreConf(data)
+      } catch {
+        alert('Eroare la citirea fișierului JSON.')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  function confirmRestore() {
+    if (!restoreConf) return
+    setPlayers(restoreConf.players)
+    setTournaments(restoreConf.tournaments)
+    setRounds(restoreConf.rounds)
+    setMatches(restoreConf.matches)
+    setRestoreConf(null)
+    setView('home')
+  }
+
   // ---- Computed stats ----
   const globalStats = useMemo(() => {
     const s = {}
@@ -323,6 +368,25 @@ export default function App() {
     </ConfirmModal>
   )
 
+  if (restoreConf) return (
+    <ConfirmModal
+      danger
+      confirmLabel="Restaurează"
+      onConfirm={confirmRestore}
+      onCancel={() => setRestoreConf(null)}
+    >
+      <div style={{ fontSize: 28, marginBottom: 8 }}>📂</div>
+      <div style={{ fontWeight: 600, marginBottom: 10 }}>Restaurezi backup-ul?</div>
+      <div style={{ background: 'var(--dangerl)', color: 'var(--danger)', borderRadius: 8, padding: '8px 12px', fontSize: 14, textAlign: 'left', marginBottom: 8 }}>
+        Datele curente vor fi înlocuite complet.
+      </div>
+      <div className="mu" style={{ fontSize: 14, textAlign: 'left' }}>
+        Backup conține: {restoreConf.players.length} jucători · {restoreConf.tournaments.length} turnee · {restoreConf.matches.length} meciuri
+        {restoreConf.exportedAt && <><br />Exportat la: {new Date(restoreConf.exportedAt).toLocaleString('ro-RO')}</>}
+      </div>
+    </ConfirmModal>
+  )
+
   // ---- Admin login ----
   if (view === 'al') return (
     <div className="pg" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 80 }}>
@@ -411,6 +475,20 @@ export default function App() {
         </div>
       </div>
 
+      <input ref={fileInputRef} type="file" accept=".json" style={{ display: 'none' }} onChange={handleRestoreFile} />
+
+      <div className="card" style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 17, fontWeight: 700, marginBottom: 12 }}>💾 Backup date</div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={exportBackup}>
+            ⬇️ Exportă backup
+          </button>
+          <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => fileInputRef.current?.click()}>
+            ⬆️ Restaurează
+          </button>
+        </div>
+      </div>
+
       <div className="card" style={{ background: 'var(--redl)', border: '1.5px solid var(--red)' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--red)', marginBottom: 12 }}>⚠️ Zonă periculoasă</div>
         <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }} onClick={async () => {
@@ -489,17 +567,83 @@ export default function App() {
   }
 
   // ---- Global stats ----
-  if (view === 'g') return (
-    <div className="pg">
-      <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
-        <BackBtn onClick={() => setView('home')} />
-        <span style={{ fontWeight: 700, fontSize: 24 }}>Statistici globale</span>
+  if (view === 'g') {
+    const allPlayed = matches.filter(m => m.st === 'a')
+    const gH2h = {}
+    allPlayed.forEach(m => {
+      const [a, b] = m.score
+      if (!gH2h[m.p1]) gH2h[m.p1] = {}
+      if (!gH2h[m.p2]) gH2h[m.p2] = {}
+      if (!gH2h[m.p1][m.p2]) gH2h[m.p1][m.p2] = { v: 0, pf: 0 }
+      if (!gH2h[m.p2][m.p1]) gH2h[m.p2][m.p1] = { v: 0, pf: 0 }
+      gH2h[m.p1][m.p2].pf += a
+      gH2h[m.p2][m.p1].pf += b
+      if (a > b) gH2h[m.p1][m.p2].v++
+      else gH2h[m.p2][m.p1].v++
+    })
+    const ps = globalStats.filter(s => s.n > 0)
+    return (
+      <div className="pg">
+        <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
+          <BackBtn onClick={() => setView('home')} />
+          <span style={{ fontWeight: 700, fontSize: 24 }}>Statistici globale</span>
+        </div>
+        {globalStats.every(s => s.n === 0)
+          ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
+          : <>
+            <StandingsTable rows={globalStats} />
+            {ps.length > 1 && (
+              <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
+                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
+                <table className="tbl">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '38%' }}>Jucător</th>
+                      <th style={{ width: '38%' }}>Adversar</th>
+                      <th>V</th>
+                      <th>Î</th>
+                      <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ps.flatMap((row, i) =>
+                      ps.filter(col => col.id !== row.id).map((col, j) => {
+                        const colRank = ps.findIndex(p => p.id === col.id)
+                        const v = gH2h[row.id]?.[col.id]?.v ?? 0
+                        const l = gH2h[col.id]?.[row.id]?.v ?? 0
+                        const pf = gH2h[row.id]?.[col.id]?.pf ?? 0
+                        return (
+                          <tr key={`${row.id}-${col.id}`}>
+                            <td style={j > 0 ? { borderTop: 'none', paddingTop: 0, paddingBottom: 0 } : (i > 0 ? { borderTop: '2px solid var(--border)' } : {})}>
+                              {j === 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <Medal rank={i + 1} />
+                                  <span style={{ fontWeight: i === 0 ? 700 : 500, fontSize: 17 }}>{row.name}</span>
+                                </div>
+                              )}
+                            </td>
+                            <td style={i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Medal rank={colRank + 1} />
+                                <span style={{ fontSize: 15 }}>{col.name}</span>
+                              </div>
+                            </td>
+                            <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{v}</td>
+                            <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{l}</td>
+                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pf}</td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        }
       </div>
-      {globalStats.every(s => s.n === 0)
-        ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
-        : <StandingsTable rows={globalStats} />}
-    </div>
-  )
+    )
+  }
 
   // ---- Tournament view ----
   if (view === 't' && t) {
@@ -524,7 +668,7 @@ export default function App() {
               <div style={{ minWidth: 48 }} />
             </div>
             <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
-              {[['r', 'Meciuri'], ['s', 'Clasament']].map(([k, lb]) => (
+              {(isClosed ? [['s', 'Clasament'], ['r', 'Meciuri']] : [['r', 'Meciuri'], ['s', 'Clasament']]).map(([k, lb]) => (
                 <button key={k}
                   onClick={() => !isClosed && k === 's' ? null : setTab(k)}
                   disabled={k === 's' && !isClosed}
@@ -540,17 +684,31 @@ export default function App() {
               ))}
             </div>
             <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: 10, padding: '10px 14px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Runda curentă</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Runda {currentRound?.num}</div>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Meciuri</div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{currentRoundPlayed}/{currentRoundMatches.length}</div>
-              </div>
-              <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%</span>
-              </div>
+              {isClosed ? (<>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Runde jucate</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{tRounds.length}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Meciuri totale</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{totalPlayed}/{totalMs}</div>
+                </div>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>🏁</span>
+                </div>
+              </>) : (<>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Runda curentă</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>Runda {currentRound?.num}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Meciuri</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{currentRoundPlayed}/{currentRoundMatches.length}</div>
+                </div>
+                <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{currentRoundMatches.length ? Math.round(currentRoundPlayed / currentRoundMatches.length * 100) : 0}%</span>
+                </div>
+              </>)}
             </div>
           </div>
         </div>
@@ -572,7 +730,7 @@ export default function App() {
               
               return (
                 <div key={r.id}>
-                  {r.id !== currentRound?.id && (
+                  {(r.id !== currentRound?.id || done) && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                       <span style={{ fontWeight: 700, fontSize: 18 }}>Runda {r.num}</span>
                       {done
@@ -617,11 +775,98 @@ export default function App() {
               </div>
             )}
           </div>
-        ) : (
-          tourneyStandings.every(s => s.n === 0)
-            ? <div className="card mu" style={{ textAlign: 'center', padding: 20 }}>Niciun meci jucat încă</div>
-            : <StandingsTable rows={tourneyStandings} />
-        )}
+        ) : (() => {
+          if (tourneyStandings.every(s => s.n === 0))
+            return <div className="card mu" style={{ textAlign: 'center', padding: 20 }}>Niciun meci jucat încă</div>
+          const h2h = {}
+          tMatches.filter(m => m.st === 'a').forEach(m => {
+            const [a, b] = m.score
+            if (!h2h[m.p1]) h2h[m.p1] = {}
+            if (!h2h[m.p2]) h2h[m.p2] = {}
+            if (!h2h[m.p1][m.p2]) h2h[m.p1][m.p2] = { v: 0, pf: 0 }
+            if (!h2h[m.p2][m.p1]) h2h[m.p2][m.p1] = { v: 0, pf: 0 }
+            h2h[m.p1][m.p2].pf += a
+            h2h[m.p2][m.p1].pf += b
+            if (a > b) h2h[m.p1][m.p2].v++
+            else h2h[m.p2][m.p1].v++
+          })
+          const ps = tourneyStandings
+          return (<>
+            <StandingsTable rows={tourneyStandings} />
+            {isClosed && ps.length > 1 && (
+              <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
+                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
+                <table className="tbl">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '38%' }}>Jucător</th>
+                      <th style={{ width: '38%' }}>Adversar</th>
+                      <th>V</th>
+                      <th>Î</th>
+                      <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ps.flatMap((row, i) =>
+                      ps.filter(col => col.id !== row.id).map((col, j) => {
+                        const colRank = ps.findIndex(p => p.id === col.id)
+                        const v = h2h[row.id]?.[col.id]?.v ?? 0
+                        const l = h2h[col.id]?.[row.id]?.v ?? 0
+                        const pf = h2h[row.id]?.[col.id]?.pf ?? 0
+                        return (
+                          <tr key={`${row.id}-${col.id}`}>
+                            <td style={j > 0 ? { borderTop: 'none', paddingTop: 0, paddingBottom: 0 } : (i > 0 ? { borderTop: '2px solid var(--border)' } : {})}>
+                              {j === 0 && (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <Medal rank={i + 1} />
+                                  <span style={{ fontWeight: i === 0 ? 700 : 500, fontSize: 17 }}>{row.name}</span>
+                                </div>
+                              )}
+                            </td>
+                            <td style={i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Medal rank={colRank + 1} />
+                                <span style={{ fontSize: 15 }}>{col.name}</span>
+                              </div>
+                            </td>
+                            <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{v}</td>
+                            <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{l}</td>
+                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pf}</td>
+                          </tr>
+                        )
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          {(() => {
+              const pw = tMatches.filter(m => m.st === 'a' && m.score && ((m.score[0] === 6 && m.score[1] === 0) || (m.score[0] === 0 && m.score[1] === 6)))
+              if (!pw.length) return null
+              return (
+                <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
+                  <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Praf și pulbere</div>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginBottom: 4 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Câștigător</span>
+                    <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 12, fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>Scor</span>
+                    <span style={{ marginLeft: 'auto', width: '20%', fontSize: 12, fontWeight: 600, color: 'var(--text2)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Adversar</span>
+                  </div>
+                  {pw.map((m, i) => {
+                    const winner = getPlayer(m.score[0] === 6 ? m.p1 : m.p2)
+                    const loser = getPlayer(m.score[0] === 6 ? m.p2 : m.p1)
+                    return (
+                      <div key={m.id} style={{ position: 'relative', display: 'flex', alignItems: 'center', padding: '10px 0', borderTop: i > 0 ? '1px solid var(--border)' : 'none' }}>
+                        <span style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 16 }}>{winner?.name ?? '?'}</span>
+                        <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontWeight: 700, fontSize: 16, color: 'var(--text2)', whiteSpace: 'nowrap' }}>6 – 0</span>
+                        <span style={{ marginLeft: 'auto', width: '20%', fontSize: 15 }}>{loser?.name ?? '?'}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )
+            })()}
+          </>)
+        })()}
       </div>
     )
   }
@@ -669,7 +914,7 @@ export default function App() {
             const nr = rounds.filter(r => r.tid === tr.id).length
             const pct = tot ? Math.round(ap / tot * 100) : 0
             return (
-              <div key={tr.id} className={`t-card ${tr.closed ? 'closed' : 'active'}`} onClick={() => go('t', { tid: tr.id, tab: 'r' })}>
+              <div key={tr.id} className={`t-card ${tr.closed ? 'closed' : 'active'}`} onClick={() => go('t', { tid: tr.id, tab: tr.closed ? 's' : 'r' })}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                   <div className="t-card-name">{tr.name}</div>
                   {tr.closed

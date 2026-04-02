@@ -38,8 +38,9 @@ export function BackBtn({ onClick, color }) {
 
 export function Medal({ rank }) {
   const medals = { 1: '🥇', 2: '🥈', 3: '🥉' }
-  if (medals[rank]) return <span style={{ fontSize: 24, lineHeight: 1 }}>{medals[rank]}</span>
-  return <span style={{ fontSize: 17, color: 'var(--text2)', minWidth: 24, textAlign: 'center' }}>{rank}</span>
+  const base = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, flexShrink: 0 }
+  if (medals[rank]) return <span style={{ ...base, fontSize: 22, lineHeight: 1 }}>{medals[rank]}</span>
+  return <span style={{ ...base, fontSize: 17, color: 'var(--text2)' }}>{rank}</span>
 }
 
 export function StandingsTable({ rows }) {
