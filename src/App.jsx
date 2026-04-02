@@ -595,14 +595,15 @@ export default function App() {
             {ps.length > 1 && (
               <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
-                <table className="tbl">
+                <table className="tbl" style={{ tableLayout: 'fixed', width: '100%' }}>
                   <thead>
                     <tr>
-                      <th style={{ width: '38%' }}>Jucător</th>
-                      <th style={{ width: '38%' }}>Adversar</th>
-                      <th>V</th>
-                      <th>Î</th>
-                      <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
+                      <th style={{ width: '34%' }}>Jucător</th>
+                      <th style={{ width: '34%' }}>Adversar</th>
+                      <th style={{ width: '8%' }}>V</th>
+                      <th style={{ width: '8%' }}>Î</th>
+                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -612,6 +613,7 @@ export default function App() {
                         const v = gH2h[row.id]?.[col.id]?.v ?? 0
                         const l = gH2h[col.id]?.[row.id]?.v ?? 0
                         const pf = gH2h[row.id]?.[col.id]?.pf ?? 0
+                        const pa = gH2h[col.id]?.[row.id]?.pf ?? 0
                         return (
                           <tr key={`${row.id}-${col.id}`}>
                             <td style={j > 0 ? { borderTop: 'none', paddingTop: 0, paddingBottom: 0 } : (i > 0 ? { borderTop: '2px solid var(--border)' } : {})}>
@@ -631,6 +633,7 @@ export default function App() {
                             <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{v}</td>
                             <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{l}</td>
                             <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pf}</td>
+                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pa}</td>
                           </tr>
                         )
                       })
@@ -796,14 +799,15 @@ export default function App() {
             {isClosed && ps.length > 1 && (
               <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
-                <table className="tbl">
+                <table className="tbl" style={{ tableLayout: 'fixed', width: '100%' }}>
                   <thead>
                     <tr>
-                      <th style={{ width: '38%' }}>Jucător</th>
-                      <th style={{ width: '38%' }}>Adversar</th>
-                      <th>V</th>
-                      <th>Î</th>
-                      <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
+                      <th style={{ width: '34%' }}>Jucător</th>
+                      <th style={{ width: '34%' }}>Adversar</th>
+                      <th style={{ width: '8%' }}>V</th>
+                      <th style={{ width: '8%' }}>Î</th>
+                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -813,6 +817,7 @@ export default function App() {
                         const v = h2h[row.id]?.[col.id]?.v ?? 0
                         const l = h2h[col.id]?.[row.id]?.v ?? 0
                         const pf = h2h[row.id]?.[col.id]?.pf ?? 0
+                        const pa = h2h[col.id]?.[row.id]?.pf ?? 0
                         return (
                           <tr key={`${row.id}-${col.id}`}>
                             <td style={j > 0 ? { borderTop: 'none', paddingTop: 0, paddingBottom: 0 } : (i > 0 ? { borderTop: '2px solid var(--border)' } : {})}>
@@ -832,6 +837,7 @@ export default function App() {
                             <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{v}</td>
                             <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{l}</td>
                             <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pf}</td>
+                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pa}</td>
                           </tr>
                         )
                       })

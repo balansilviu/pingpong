@@ -53,7 +53,8 @@ export function StandingsTable({ rows }) {
             <th>V</th>
             <th>Î</th>
             <th style={{ color: 'var(--text2)', fontWeight: 500 }}>+/−</th>
-            <th style={{ color: 'var(--text2)', fontWeight: 500 }}>Pct</th>
+            <th style={{ color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+            <th style={{ color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
           </tr>
         </thead>
         <tbody>
@@ -73,6 +74,7 @@ export function StandingsTable({ rows }) {
                   {diff > 0 ? '+' : ''}{diff}
                 </td>
                 <td style={{ fontSize: 15, color: 'var(--text2)' }}>{s.pf}</td>
+                <td style={{ fontSize: 15, color: 'var(--text2)' }}>{s.pa}</td>
               </tr>
             )
           })}
