@@ -598,12 +598,12 @@ export default function App() {
                 <table className="tbl" style={{ tableLayout: 'fixed', width: '100%' }}>
                   <thead>
                     <tr>
-                      <th style={{ width: '34%' }}>Jucător</th>
-                      <th style={{ width: '34%' }}>Adversar</th>
-                      <th style={{ width: '8%' }}>V</th>
-                      <th style={{ width: '8%' }}>Î</th>
-                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
-                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
+                      <th style={{ width: '30%' }}>Jucător</th>
+                      <th style={{ width: '30%' }}>Adversar</th>
+                      <th style={{ width: '10%' }}>V</th>
+                      <th style={{ width: '10%' }}>Î</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -802,12 +802,12 @@ export default function App() {
                 <table className="tbl" style={{ tableLayout: 'fixed', width: '100%' }}>
                   <thead>
                     <tr>
-                      <th style={{ width: '34%' }}>Jucător</th>
-                      <th style={{ width: '34%' }}>Adversar</th>
-                      <th style={{ width: '8%' }}>V</th>
-                      <th style={{ width: '8%' }}>Î</th>
-                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
-                      <th style={{ width: '8%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
+                      <th style={{ width: '30%' }}>Jucător</th>
+                      <th style={{ width: '30%' }}>Adversar</th>
+                      <th style={{ width: '10%' }}>V</th>
+                      <th style={{ width: '10%' }}>Î</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
                     </tr>
                   </thead>
                   <tbody>
