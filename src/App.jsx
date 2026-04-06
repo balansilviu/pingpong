@@ -248,6 +248,7 @@ export default function App() {
   // ---- Computed stats ----
   const globalStats = useMemo(() => {
     const s = {}
+    const h2h = {}
     players.forEach(p => s[p.id] = { ...p, w: 0, l: 0, pf: 0, pa: 0, n: 0, tr: 0 })
     matches.filter(m => m.st === 'a').forEach(m => {
       const [a, b] = m.score
@@ -255,11 +256,13 @@ export default function App() {
       s[m.p1].n++; s[m.p2].n++
       s[m.p1].pf += a; s[m.p1].pa += b
       s[m.p2].pf += b; s[m.p2].pa += a
-      if (a > b) { s[m.p1].w++; s[m.p2].l++ }
-      else { s[m.p2].w++; s[m.p1].l++ }
+      if (!h2h[m.p1]) h2h[m.p1] = {}
+      if (!h2h[m.p2]) h2h[m.p2] = {}
+      if (a > b) { h2h[m.p1][m.p2] = (h2h[m.p1][m.p2] || 0) + 1; s[m.p1].w++; s[m.p2].l++ }
+      else { h2h[m.p2][m.p1] = (h2h[m.p2][m.p1] || 0) + 1; s[m.p2].w++; s[m.p1].l++ }
     })
     tournaments.forEach(t => t.pids.forEach(id => { if (s[id]) s[id].tr++ }))
-    return sortStandingsGlobal(Object.values(s))
+    return sortStandingsGlobal(Object.values(s), h2h)
   }, [matches, players, tournaments])
 
   const tourneyStandings = useMemo(

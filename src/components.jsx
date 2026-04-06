@@ -80,7 +80,7 @@ export function StandingsTable({ rows }) {
         </tbody>
       </table>
       <div style={{ marginTop: 14, fontSize: 13, color: 'var(--text2)' }}>
-        Departajare: diferență V−Î, apoi puncte marcate
+        Departajare: meciuri directe, diferență V−Î, apoi puncte marcate
       </div>
     </div>
   )

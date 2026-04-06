@@ -106,10 +106,13 @@ export function valScore(a, b) {
   return 'Scoruri valide: 11 (cu 2-9), 6-0, 9-1, 12-10'
 }
 
-// Clasament turneu: victorii → diferență puncte → puncte marcate
-export function sortStandings(arr) {
+// Clasament turneu: victorii → meciuri directe → diferență puncte → puncte marcate
+export function sortStandings(arr, h2h = {}) {
   return [...arr].sort((a, b) => {
     if (b.w !== a.w) return b.w - a.w
+    const aVsB = h2h[a.id]?.[b.id] ?? 0
+    const bVsA = h2h[b.id]?.[a.id] ?? 0
+    if (aVsB !== bVsA) return bVsA - aVsB
     const diffA = a.pf - a.pa
     const diffB = b.pf - b.pa
     if (diffB !== diffA) return diffB - diffA
@@ -117,10 +120,13 @@ export function sortStandings(arr) {
   })
 }
 
-// Clasament global: victorii → procent victorii → puncte marcate
-export function sortStandingsGlobal(arr) {
+// Clasament global: victorii → meciuri directe → procent victorii → puncte marcate
+export function sortStandingsGlobal(arr, h2h = {}) {
   return [...arr].sort((a, b) => {
     if (b.w !== a.w) return b.w - a.w
+    const aVsB = h2h[a.id]?.[b.id] ?? 0
+    const bVsA = h2h[b.id]?.[a.id] ?? 0
+    if (aVsB !== bVsA) return bVsA - aVsB
     const pa = a.n > 0 ? a.w / a.n : 0
     const pb = b.n > 0 ? b.w / b.n : 0
     if (Math.abs(pb - pa) > 0.0001) return pb - pa
@@ -130,6 +136,7 @@ export function sortStandingsGlobal(arr) {
 
 export function calcStandings(matches, pids, players) {
   const s = {}
+  const h2h = {}
   pids.forEach(id => s[id] = { w: 0, l: 0, pf: 0, pa: 0, n: 0 })
   matches.filter(m => m.st === 'a').forEach(m => {
     const [a, b] = m.score
@@ -137,13 +144,20 @@ export function calcStandings(matches, pids, players) {
     s[m.p1].n++; s[m.p2].n++
     s[m.p1].pf += a; s[m.p1].pa += b
     s[m.p2].pf += b; s[m.p2].pa += a
-    if (a > b) { s[m.p1].w++; s[m.p2].l++ }
-    else { s[m.p2].w++; s[m.p1].l++ }
+    if (!h2h[m.p1]) h2h[m.p1] = {}
+    if (!h2h[m.p2]) h2h[m.p2] = {}
+    if (a > b) {
+      h2h[m.p1][m.p2] = (h2h[m.p1][m.p2] || 0) + 1
+      s[m.p1].w++; s[m.p2].l++
+    } else {
+      h2h[m.p2][m.p1] = (h2h[m.p2][m.p1] || 0) + 1
+      s[m.p2].w++; s[m.p1].l++
+    }
   })
   return sortStandings(pids.map(id => {
     const player = players.find(p => p.id === id)
     return { id, name: player?.name ?? '(șters)', ...s[id] }
-  }))
+  }), h2h)
 }
 
 export function unequalWarn(matches, pids) {
