@@ -482,7 +482,7 @@ export default function App() {
       <div className="card" style={{ marginBottom: 20 }}>
         {tournaments.length === 0 && <div className="mu" style={{ textAlign: 'center', padding: 16 }}>Niciun turneu creat</div>}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {[...tournaments].reverse().map(tr => (
+          {[...tournaments].sort((a, b) => { const p = d => { const [dd,mm,yy] = d.split('.'); return new Date(yy, mm-1, dd) }; return p(b.date) - p(a.date) }).map(tr => (
             <div key={tr.id} className="row" style={{ padding: '10px 12px', borderRadius: 14, background: 'var(--muted)' }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 17, fontWeight: 600, marginBottom: 2 }}>{tr.name}</div>
@@ -935,7 +935,7 @@ export default function App() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {[...tournaments].reverse().map(tr => {
+          {[...tournaments].sort((a, b) => { const p = d => { const [dd,mm,yy] = d.split('.'); return new Date(yy, mm-1, dd) }; return p(b.date) - p(a.date) }).map(tr => {
             const tms = matches.filter(m => m.tid === tr.id)
             const ap = tms.filter(m => m.st === 'a').length
             const tot = tms.filter(m => m.st !== 'x').length
