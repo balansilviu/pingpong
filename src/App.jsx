@@ -32,6 +32,8 @@ export default function App() {
   const [cancelTourneyConf, setCancelTourneyConf] = useState(false)
   const [openMatchId, setOpenMatchId] = useState(null)
   const [restoreConf, setRestoreConf] = useState(null)
+  const [clearAllConf, setClearAllConf] = useState(0) // 0=off, 1=step1, 2=step2
+  const [clearAllInput, setClearAllInput] = useState('')
   const fileInputRef = useRef(null)
   const [syncStatus, setSyncStatus] = useState('ok') // 'ok' | 'saving' | 'error'
 
@@ -517,16 +519,62 @@ export default function App() {
 
       <div className="card" style={{ background: 'var(--redl)', border: '1.5px solid var(--red)' }}>
         <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--red)', marginBottom: 12 }}>⚠️ Zonă periculoasă</div>
-        <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }} onClick={async () => {
-          if (confirm('Ești sigur? Toate turnee, meciuri și scoruri vor fi șterse!')) {
-            await clearAllData()
-            setPlayers(INIT_PLAYERS)
-            setTournaments([])
-            setRounds([])
-            setMatches([])
-            setView('home')
-          }
-        }}>🗑️ Șterge TOTUL</button>
+
+        {clearAllConf === 0 && (
+          <button className="btn" style={{ width: '100%', justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff' }}
+            onClick={() => setClearAllConf(1)}>
+            🗑️ Șterge TOTUL
+          </button>
+        )}
+
+        {clearAllConf === 1 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 14, color: 'var(--red)', fontWeight: 600, textAlign: 'center' }}>
+              Ești sigur? Se vor șterge <strong>toate turneele, rundele, meciurile și scorurile</strong>. Acțiunea este ireversibilă.
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setClearAllConf(0)}>Anulează</button>
+              <button className="btn" style={{ flex: 1, justifyContent: 'center', color: 'var(--red)', borderColor: 'var(--red)', background: '#fff', fontWeight: 700 }}
+                onClick={() => { setClearAllConf(2); setClearAllInput('') }}>
+                Da, continuă
+              </button>
+            </div>
+          </div>
+        )}
+
+        {clearAllConf === 2 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 14, color: 'var(--red)', fontWeight: 600, textAlign: 'center' }}>
+              Scrie <strong>ȘTERGE</strong> pentru a confirma:
+            </div>
+            <input
+              className="inp"
+              placeholder="ȘTERGE"
+              value={clearAllInput}
+              onInput={e => setClearAllInput(e.target.value)}
+              style={{ borderColor: 'var(--red)', textAlign: 'center', fontWeight: 700 }}
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setClearAllConf(0); setClearAllInput('') }}>Anulează</button>
+              <button
+                className="btn"
+                disabled={clearAllInput !== 'ȘTERGE'}
+                style={{ flex: 1, justifyContent: 'center', color: '#fff', borderColor: 'var(--red)', background: clearAllInput === 'ȘTERGE' ? 'var(--red)' : 'var(--muted)', fontWeight: 700, cursor: clearAllInput === 'ȘTERGE' ? 'pointer' : 'not-allowed' }}
+                onClick={async () => {
+                  await clearAllData()
+                  setPlayers(INIT_PLAYERS)
+                  setTournaments([])
+                  setRounds([])
+                  setMatches([])
+                  setClearAllConf(0)
+                  setClearAllInput('')
+                  setView('home')
+                }}>
+                Șterge definitiv
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
