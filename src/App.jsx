@@ -545,21 +545,22 @@ export default function App() {
         {clearAllConf === 2 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ fontSize: 14, color: 'var(--red)', fontWeight: 600, textAlign: 'center' }}>
-              Scrie <strong>ȘTERGE</strong> pentru a confirma:
+              Scrie <strong>STERGE</strong> pentru a confirma:
             </div>
             <input
               className="inp"
-              placeholder="ȘTERGE"
+              placeholder="STERGE"
               value={clearAllInput}
               onInput={e => setClearAllInput(e.target.value)}
               style={{ borderColor: 'var(--red)', textAlign: 'center', fontWeight: 700 }}
+              autoFocus
             />
             <div style={{ display: 'flex', gap: 8 }}>
               <button className="btn" style={{ flex: 1, justifyContent: 'center' }} onClick={() => { setClearAllConf(0); setClearAllInput('') }}>Anulează</button>
               <button
                 className="btn"
-                disabled={clearAllInput !== 'ȘTERGE'}
-                style={{ flex: 1, justifyContent: 'center', color: '#fff', borderColor: 'var(--red)', background: clearAllInput === 'ȘTERGE' ? 'var(--red)' : 'var(--muted)', fontWeight: 700, cursor: clearAllInput === 'ȘTERGE' ? 'pointer' : 'not-allowed' }}
+                disabled={clearAllInput !== 'STERGE'}
+                style={{ flex: 1, justifyContent: 'center', color: '#fff', borderColor: 'var(--red)', background: clearAllInput === 'STERGE' ? 'var(--red)' : 'var(--muted)', fontWeight: 700, cursor: clearAllInput === 'STERGE' ? 'pointer' : 'not-allowed' }}
                 onClick={async () => {
                   await clearAllData()
                   setPlayers(INIT_PLAYERS)
