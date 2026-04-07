@@ -17,6 +17,7 @@ export default function App() {
   const [tid, setTid] = useState(null)
   const [tab, setTab] = useState('r') // r | s
   const [pid, setPid] = useState(null)
+  const [prevView, setPrevView] = useState('g')
 
   const [pin, setPin] = useState('')
   const [pinErr, setPinErr] = useState(false)
@@ -508,7 +509,7 @@ export default function App() {
           <div className="sec-hd" style={{ marginTop: 4 }}>
             <span className="sec-hd-title">Clasament general</span>
           </div>
-          <StandingsTable rows={globalStats.filter(s => s.n > 0)} onPlayerClick={id => { setPid(id); setView('p') }} />
+          <StandingsTable rows={globalStats.filter(s => s.n > 0)} onPlayerClick={id => { setPid(id); setPrevView('a'); setView('p') }} />
           <div style={{ marginBottom: 20 }} />
         </>
       )}
@@ -691,7 +692,7 @@ export default function App() {
     return (
       <div className="pg">{syncDot}
         <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
-          <BackBtn onClick={() => setView('home')} />
+          <BackBtn onClick={() => setView(prevView)} />
           <span style={{ fontWeight: 700, fontSize: 22, flex: 1 }}>{player?.name}</span>
         </div>
 
@@ -820,7 +821,7 @@ export default function App() {
             const gs = globalStats.find(s => s.id === p.id) || { w: 0, l: 0, n: 0 }
             return (
               <div key={p.id}
-                onClick={() => { setPid(p.id); setView('p') }}
+                onClick={() => { setPid(p.id); setPrevView('g'); setView('p') }}
                 style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid var(--border)' }}>
                 <div className="av">{p.name.trim()[0]}</div>
                 <div style={{ flex: 1 }}>
