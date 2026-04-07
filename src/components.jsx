@@ -42,7 +42,7 @@ export function Medal({ rank }) {
   return <span style={{ ...base, fontSize: 17, color: 'var(--text2)' }}>{rank}</span>
 }
 
-export function StandingsTable({ rows }) {
+export function StandingsTable({ rows, onPlayerClick }) {
   return (
     <div className="card" style={{ padding: '20px 16px' }}>
       <table className="tbl">
@@ -60,7 +60,8 @@ export function StandingsTable({ rows }) {
           {rows.map((s, i) => {
             const diff = s.w - s.l
             return (
-              <tr key={s.id}>
+              <tr key={s.id} onClick={onPlayerClick ? () => onPlayerClick(s.id) : undefined}
+                style={onPlayerClick ? { cursor: 'pointer' } : undefined}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Medal rank={i + 1} />

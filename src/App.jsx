@@ -13,9 +13,10 @@ export default function App() {
   const loaded = useRef(false)
   const [loading, setLoading] = useState(true)
 
-  const [view, setView] = useState('home') // home | c | t | g | a | al
+  const [view, setView] = useState('home') // home | c | t | g | a | al | p
   const [tid, setTid] = useState(null)
   const [tab, setTab] = useState('r') // r | s
+  const [pid, setPid] = useState(null)
 
   const [pin, setPin] = useState('')
   const [pinErr, setPinErr] = useState(false)
@@ -591,6 +592,158 @@ export default function App() {
     )
   }
 
+  // ---- Player profile ----
+  if (view === 'p' && pid) {
+    const player = players.find(p => p.id === pid)
+    const gs = globalStats.find(s => s.id === pid) || { w: 0, l: 0, pf: 0, pa: 0, n: 0 }
+    const pct = gs.n > 0 ? Math.round(gs.w / gs.n * 100) : 0
+
+    // Față în față vs fiecare adversar
+    const h2hStats = {}
+    matches.filter(m => m.st === 'a' && (m.p1 === pid || m.p2 === pid)).forEach(m => {
+      const [a, b] = m.score
+      const oppId = m.p1 === pid ? m.p2 : m.p1
+      const myScore = m.p1 === pid ? a : b
+      const oppScore = m.p1 === pid ? b : a
+      if (!h2hStats[oppId]) h2hStats[oppId] = { w: 0, l: 0, pf: 0, pa: 0 }
+      h2hStats[oppId].pf += myScore
+      h2hStats[oppId].pa += oppScore
+      if (myScore > oppScore) h2hStats[oppId].w++
+      else h2hStats[oppId].l++
+    })
+
+    // Istoric turnee
+    const myTournaments = tournaments
+      .filter(t => t.pids.includes(pid))
+      .map(t => {
+        const tms = matches.filter(m => m.tid === t.id && m.st === 'a')
+        const standings = calcStandings(tms, t.pids, players)
+        const rank = standings.findIndex(s => s.id === pid) + 1
+        const myRow = standings.find(s => s.id === pid) || { w: 0, l: 0 }
+        return { ...t, rank, w: myRow.w, l: myRow.l }
+      })
+      .sort((a, b) => {
+        const p = d => { const [dd, mm, yy] = d.split('.'); return new Date(yy, mm - 1, dd) }
+        return p(b.date) - p(a.date)
+      })
+
+    const bestTourney = myTournaments.filter(t => t.rank === 1)
+
+    return (
+      <div className="pg">{syncDot}
+        <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
+          <BackBtn onClick={() => setView('home')} />
+          <span style={{ fontWeight: 700, fontSize: 22, flex: 1 }}>{player?.name}</span>
+        </div>
+
+        {/* Sumar general */}
+        <div className="card" style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 14 }}>Sumar general</div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 14 }}>
+            <div style={{ textAlign: 'center', background: 'var(--muted)', borderRadius: 12, padding: '12px 8px' }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--ac)' }}>{gs.w}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>Victorii</div>
+            </div>
+            <div style={{ textAlign: 'center', background: 'var(--muted)', borderRadius: 12, padding: '12px 8px' }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: 'var(--danger)' }}>{gs.l}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>Înfrângeri</div>
+            </div>
+            <div style={{ textAlign: 'center', background: 'var(--muted)', borderRadius: 12, padding: '12px 8px' }}>
+              <div style={{ fontSize: 26, fontWeight: 800 }}>{pct}%</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)', marginTop: 2 }}>% victorii</div>
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>{gs.n}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)' }}>Meciuri</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 700 }}>{myTournaments.length}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)' }}>Turnee</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--ac)' }}>{gs.pf}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)' }}>+Pct</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--danger)' }}>{gs.pa}</div>
+              <div style={{ fontSize: 12, color: 'var(--text2)' }}>−Pct</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Față în față */}
+        {Object.keys(h2hStats).length > 0 && (
+          <div className="card" style={{ marginBottom: 16, padding: '20px 16px' }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th style={{ width: '40%', textAlign: 'left' }}>Adversar</th>
+                  <th>V</th>
+                  <th>Î</th>
+                  <th style={{ color: 'var(--text2)', fontWeight: 500 }}>+Pct</th>
+                  <th style={{ color: 'var(--text2)', fontWeight: 500 }}>−Pct</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(h2hStats)
+                  .sort((a, b) => b[1].w - a[1].w)
+                  .map(([oppId, s]) => {
+                    const opp = players.find(p => p.id === oppId)
+                    return (
+                      <tr key={oppId}>
+                        <td style={{ textAlign: 'left' }}>{opp?.name ?? '(șters)'}</td>
+                        <td style={{ fontWeight: 700, color: 'var(--ac)' }}>{s.w}</td>
+                        <td style={{ fontWeight: 700, color: 'var(--danger)' }}>{s.l}</td>
+                        <td style={{ color: 'var(--text2)' }}>{s.pf}</td>
+                        <td style={{ color: 'var(--text2)' }}>{s.pa}</td>
+                      </tr>
+                    )
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Recorduri */}
+        {bestTourney.length > 0 && (
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Recorduri</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--muted)', borderRadius: 12, padding: '12px 14px' }}>
+              <span style={{ fontSize: 28 }}>🥇</span>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 15 }}>Locul 1</div>
+                <div style={{ fontSize: 13, color: 'var(--text2)' }}>
+                  {bestTourney.map(t => t.name).join(', ')}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Istoric turnee */}
+        {myTournaments.length > 0 && (
+          <div className="card">
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Istoric turnee</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {myTournaments.map(t => (
+                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+                  <Medal rank={t.rank} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 15 }}>{t.name}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text2)' }}>{t.w}V / {t.l}Î</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   // ---- Global stats ----
   if (view === 'g') {
     const allPlayed = matches.filter(m => m.st === 'a')
@@ -616,7 +769,7 @@ export default function App() {
         {globalStats.every(s => s.n === 0)
           ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
           : <>
-            <StandingsTable rows={globalStats} />
+            <StandingsTable rows={globalStats} onPlayerClick={id => { setPid(id); setView('p') }} />
             {ps.length > 1 && (
               <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
                 <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
@@ -925,7 +1078,7 @@ export default function App() {
             <span className="sec-hd-title">Clasament general</span>
             <button className="btn sm" style={{ fontSize: 13, color: 'var(--text2)' }} onClick={() => setView('g')}>Vezi detalii →</button>
           </div>
-          <StandingsTable rows={globalStats.filter(s => s.n > 0)} />
+          <StandingsTable rows={globalStats.filter(s => s.n > 0)} onPlayerClick={id => { setPid(id); setView('p') }} />
         </div>
       )}
 
