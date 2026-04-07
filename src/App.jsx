@@ -919,6 +919,16 @@ export default function App() {
         </div>
       </div>
 
+      {globalStats.filter(s => s.n > 0).length > 0 && (
+        <div style={{ marginBottom: 20 }}>
+          <div className="sec-hd" style={{ marginBottom: 8 }}>
+            <span className="sec-hd-title">Clasament general</span>
+            <button className="btn sm" style={{ fontSize: 13, color: 'var(--text2)' }} onClick={() => setView('g')}>Vezi detalii →</button>
+          </div>
+          <StandingsTable rows={globalStats.filter(s => s.n > 0)} />
+        </div>
+      )}
+
       <div className="sec-hd">
         <span className="sec-hd-title">Turnee</span>
         <button className="btn ac sm" disabled={hasActiveTournament} style={hasActiveTournament ? { opacity: 0.4, cursor: 'not-allowed' } : {}} onClick={openCreate}>+ Turneu nou</button>
