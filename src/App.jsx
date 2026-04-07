@@ -503,6 +503,16 @@ export default function App() {
         </div>
       </div>
 
+      {globalStats.filter(s => s.n > 0).length > 0 && (
+        <>
+          <div className="sec-hd" style={{ marginTop: 4 }}>
+            <span className="sec-hd-title">Clasament general</span>
+          </div>
+          <StandingsTable rows={globalStats.filter(s => s.n > 0)} onPlayerClick={id => { setPid(id); setView('p') }} />
+          <div style={{ marginBottom: 20 }} />
+        </>
+      )}
+
       <input ref={fileInputRef} type="file" accept=".json" style={{ display: 'none' }} onChange={handleRestoreFile} />
 
       <div className="card" style={{ marginBottom: 16 }}>
