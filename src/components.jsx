@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const PIN = '1234'
+export const PIN = '2143'
 
 export const INIT_PLAYERS = [
   { id: 'p1', name: 'Dănuț' },
