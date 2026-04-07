@@ -795,82 +795,35 @@ export default function App() {
 
   // ---- Global stats ----
   if (view === 'g') {
-    const allPlayed = matches.filter(m => m.st === 'a')
-    const gH2h = {}
-    allPlayed.forEach(m => {
-      const [a, b] = m.score
-      if (!gH2h[m.p1]) gH2h[m.p1] = {}
-      if (!gH2h[m.p2]) gH2h[m.p2] = {}
-      if (!gH2h[m.p1][m.p2]) gH2h[m.p1][m.p2] = { v: 0, pf: 0 }
-      if (!gH2h[m.p2][m.p1]) gH2h[m.p2][m.p1] = { v: 0, pf: 0 }
-      gH2h[m.p1][m.p2].pf += a
-      gH2h[m.p2][m.p1].pf += b
-      if (a > b) gH2h[m.p1][m.p2].v++
-      else gH2h[m.p2][m.p1].v++
-    })
-    const ps = globalStats.filter(s => s.n > 0)
+    const sortedPlayers = [...players].sort((a, b) => a.name.trim().localeCompare(b.name.trim(), 'ro'))
     return (
       <div className="pg">{syncDot}
         <div className="row" style={{ marginBottom: 20, paddingTop: 4 }}>
           <BackBtn onClick={() => setView('home')} />
           <span style={{ fontWeight: 700, fontSize: 24 }}>Statistici globale</span>
         </div>
-        {globalStats.every(s => s.n === 0)
-          ? <div className="card mu" style={{ textAlign: 'center', padding: 24 }}>Niciun meci jucat încă</div>
-          : <>
-            <StandingsTable rows={globalStats} onPlayerClick={id => { setPid(id); setView('p') }} />
-            {ps.length > 1 && (
-              <div className="card" style={{ marginTop: 16, padding: '20px 16px' }}>
-                <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Față în față</div>
-                <table className="tbl" style={{ tableLayout: 'fixed', width: '100%' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ width: '30%' }}>Jucător</th>
-                      <th style={{ width: '30%' }}>Adversar</th>
-                      <th style={{ width: '10%' }}>V</th>
-                      <th style={{ width: '10%' }}>Î</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>+Pct</th>
-                      <th style={{ width: '10%', color: 'var(--text2)', fontWeight: 500, padding: '0 0 14px', textAlign: 'center' }}>−Pct</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {ps.flatMap((row, i) =>
-                      ps.filter(col => col.id !== row.id).map((col, j) => {
-                        const colRank = ps.findIndex(p => p.id === col.id)
-                        const v = gH2h[row.id]?.[col.id]?.v ?? 0
-                        const l = gH2h[col.id]?.[row.id]?.v ?? 0
-                        const pf = gH2h[row.id]?.[col.id]?.pf ?? 0
-                        const pa = gH2h[col.id]?.[row.id]?.pf ?? 0
-                        return (
-                          <tr key={`${row.id}-${col.id}`}>
-                            <td style={j > 0 ? { borderTop: 'none', paddingTop: 0, paddingBottom: 0 } : (i > 0 ? { borderTop: '2px solid var(--border)' } : {})}>
-                              {j === 0 && (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                  <Medal rank={i + 1} />
-                                  <span style={{ fontWeight: i === 0 ? 700 : 500, fontSize: 17 }}>{row.name}</span>
-                                </div>
-                              )}
-                            </td>
-                            <td style={i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Medal rank={colRank + 1} />
-                                <span style={{ fontSize: 15 }}>{col.name}</span>
-                              </div>
-                            </td>
-                            <td style={{ fontWeight: 700, color: 'var(--ac)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{v}</td>
-                            <td style={{ fontWeight: 700, color: 'var(--danger)', fontSize: 19, ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{l}</td>
-                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pf}</td>
-                            <td style={{ fontSize: 15, color: 'var(--text2)', ...(i > 0 && j === 0 ? { borderTop: '2px solid var(--border)' } : {}) }}>{pa}</td>
-                          </tr>
-                        )
-                      })
-                    )}
-                  </tbody>
-                </table>
+        <div style={{ fontSize: 13, color: 'var(--text2)', textAlign: 'center', marginBottom: 12 }}>
+          Apasă pe un jucător pentru a vedea statisticile lui
+        </div>
+        <div className="card" style={{ padding: '8px 0' }}>
+          {sortedPlayers.map(p => {
+            const gs = globalStats.find(s => s.id === p.id) || { w: 0, l: 0, n: 0 }
+            return (
+              <div key={p.id}
+                onClick={() => { setPid(p.id); setView('p') }}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid var(--border)' }}>
+                <div className="av">{p.name.trim()[0]}</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 17 }}>{p.name.trim()}</div>
+                  {gs.n > 0
+                    ? <div style={{ fontSize: 13, color: 'var(--text2)' }}>{gs.w}V / {gs.l}Î · {gs.n} meciuri</div>
+                    : <div style={{ fontSize: 13, color: 'var(--text2)' }}>Niciun meci jucat</div>}
+                </div>
+                <span style={{ fontSize: 18, color: 'var(--text2)' }}>›</span>
               </div>
-            )}
-          </>
-        }
+            )
+          })}
+        </div>
       </div>
     )
   }
