@@ -768,20 +768,27 @@ export default function App() {
         )}
 
         {/* Recorduri */}
-        {bestTourney.length > 0 && (
-          <div className="card" style={{ marginBottom: 16 }}>
-            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Recorduri</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--muted)', borderRadius: 12, padding: '12px 14px' }}>
-              <span style={{ fontSize: 28 }}>🥇</span>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 15 }}>Locul 1</div>
-                <div style={{ fontSize: 13, color: 'var(--text2)' }}>
-                  {bestTourney.map(t => t.name).join(', ')}
+        {myTournaments.length > 0 && (() => {
+          const bestRank = Math.min(...myTournaments.map(t => t.rank))
+          const bestTs = myTournaments.filter(t => t.rank === bestRank)
+          return (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Cel mai bun rezultat</div>
+              {bestTs.map(bt => (
+                <div key={bt.id}
+                  onClick={() => go('t', { tid: bt.id, tab: 's' })}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--muted)', borderRadius: 12, padding: '12px 14px', cursor: 'pointer', marginBottom: 8 }}>
+                  <Medal rank={bestRank} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 600, fontSize: 15 }}>Locul {bestRank}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text2)' }}>{bt.name}</div>
+                  </div>
+                  <span style={{ fontSize: 18, color: 'var(--text2)' }}>›</span>
                 </div>
-              </div>
+              ))}
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {/* Istoric turnee */}
         {myTournaments.length > 0 && (
