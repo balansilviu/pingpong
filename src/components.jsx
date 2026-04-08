@@ -36,6 +36,18 @@ export function BackBtn({ onClick, color }) {
   )
 }
 
+export function HomeBtn({ onClick, color }) {
+  return (
+    <button
+      className="btn sm"
+      style={{ border: 'none', background: 'transparent', minWidth: 40, justifyContent: 'center', fontSize: 18, color: color || 'inherit', boxShadow: 'none' }}
+      onClick={onClick}
+    >
+      🏠
+    </button>
+  )
+}
+
 export function Medal({ rank }) {
   const base = { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, flexShrink: 0 }
   if (rank === 1) return <span style={{ ...base, fontSize: 22, lineHeight: 1 }}>🥇</span>
