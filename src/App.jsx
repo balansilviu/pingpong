@@ -818,12 +818,14 @@ export default function App() {
             <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 12 }}>Istoric turnee</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {myTournaments.map(t => (
-                <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+                <div key={t.id} onClick={() => go('t', { tid: t.id, tab: 's' })}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--border)', cursor: 'pointer' }}>
                   <Medal rank={t.rank} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 15 }}>{t.name}</div>
                     <div style={{ fontSize: 13, color: 'var(--text2)' }}>{t.w}V / {t.l}Î</div>
                   </div>
+                  <span style={{ fontSize: 18, color: 'var(--text2)' }}>›</span>
                 </div>
               ))}
             </div>
